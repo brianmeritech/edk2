@@ -109,9 +109,9 @@ goto check_cygwin
 if not defined NASM_PREFIX (
     @echo.
     @echo !!! WARNING !!! NASM_PREFIX environment variable is not set
-    @if exist "C:\nasm\nasm.exe" @set "NASM_PREFIX=C:\nasm\"
-    @if exist "C:\nasm\nasm.exe" @echo   Found nasm.exe, setting the environment variable to C:\nasm\
-    @if not exist "C:\nasm\nasm.exe" echo   Attempting to build modules that require NASM will fail.
+    @if exist "G:\nasm\nasm.exe" @set "NASM_PREFIX=G:\nasm\"
+    @if exist "G:\nasm\nasm.exe" @echo   Found nasm.exe, setting the environment variable to G:\nasm\
+    @if not exist "G:\nasm\nasm.exe" echo   Attempting to build modules that require NASM will fail.
 )
 
 :check_CLANGPDB
