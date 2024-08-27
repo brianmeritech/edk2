@@ -11,6 +11,48 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
+#include <Library/IoLib.h>
+
+#define COM2    0x3E8
+
+void initUartPort(UINT8 port)
+{
+  IoWrite8(0x80, 0x08);
+  IoWrite8(port + 3, 0x80);
+  IoWrite8(port + 1, 0);
+  IoWrite8(port, 0x01);    // 115200 bps
+  IoWrite8(port + 3, 0x03);
+  IoWrite8(port + 2, 0xC7);
+  IoWrite8(port + 1, 0x00);
+
+                    // Delay 20ms
+}
+
+void sendUartBuffer(UINT8* tbuf, UINT8 tcnt)
+{
+  UINT8 i;
+  UINT8 regData;
+
+  i = 0;
+  while (i < tcnt) {
+    do {
+      regData = IoRead8(COM2 + 5);
+    } while (!(regData & (1 << 5)));
+
+    IoWrite8(COM2, tbuf[i]);
+   
+    i++;
+  }
+  // printf("\n");
+}
+
+VOID SerialOutTest()
+{
+  UINT8 HelloStr[] = { "Hello World GNRAP\n" };
+  UINT8 StrSize = sizeof(HelloStr);
+  sendUartBuffer(&HelloStr[0], StrSize);
+  sendUartBuffer(&HelloStr[0], 18);
+}
 
 //
 // String token ID of help message text.
@@ -55,6 +97,10 @@ UefiMain (
       Print ((CHAR16 *)PcdGetPtr (PcdHelloWorldPrintString));
     }
   }
+
+  //brnxxxx 20240827 gnrap hello world test >>>>
+  SerialOutTest();
+  //brnxxxx 20240827 gnrap hello world test <<<<
 
   return EFI_SUCCESS;
 }
