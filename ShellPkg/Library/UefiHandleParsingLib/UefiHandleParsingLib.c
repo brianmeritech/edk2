@@ -462,6 +462,76 @@ EXIT:
   return RetVal;
 }
 
+//brnxxxx 20240823 test >>>>
+STATIC CONST CHAR8  Hex[] = {
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F'
+};
+
+CHAR16 *
+EFIAPI
+InCatSDumpHex(
+  IN CHAR16* Buffer,
+  IN UINTN   Indent,
+  IN UINTN   Offset,
+  IN UINTN   DataSize,
+  IN VOID* UserData
+)
+{
+  UINT8* Data;
+  UINT8   TempByte;
+  UINTN   Size;
+  UINTN   Index;
+  CHAR8   Val[50];
+  CHAR8   Str[20];
+  CHAR16* RetVal;
+  CHAR16* TempRetVal;
+
+  Data = UserData;
+  RetVal = Buffer;
+  while (DataSize != 0) {
+    Size = 16;
+    if (Size > DataSize) {
+      Size = DataSize;
+    }
+
+    for (Index = 0; Index < Size; Index += 1) {
+      TempByte = Data[Index];
+      Val[Index * 3 + 0] = Hex[TempByte >> 4];
+      Val[Index * 3 + 1] = Hex[TempByte & 0xF];
+      Val[Index * 3 + 2] = (CHAR8)((Index == 7) ? '-' : ' ');
+      Str[Index] = (CHAR8)((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
+    }
+
+    Val[Index * 3] = 0;
+    Str[Index] = 0;
+    TempRetVal = CatSPrint(RetVal, L"%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str);
+    SHELL_FREE_NON_NULL(RetVal);
+    RetVal = TempRetVal;
+
+    Data += Size;
+    Offset += Size;
+    DataSize -= Size;
+  }
+
+  return RetVal;
+}
+//brnxxxx 20240823 test <<<<
+
 /**
   Function to dump information about EDID Discovered Protocol.
 
@@ -521,7 +591,7 @@ EdidDiscoveredProtocolDumpInformation (
     SHELL_FREE_NON_NULL (RetVal);
     RetVal = TempRetVal;
 
-    TempRetVal = CatSDumpHex (RetVal, 4, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
+    TempRetVal = InCatSDumpHex(RetVal, 4, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
     RetVal     = TempRetVal;
   }
 
@@ -587,7 +657,7 @@ EdidActiveProtocolDumpInformation (
     SHELL_FREE_NON_NULL (RetVal);
     RetVal = TempRetVal;
 
-    TempRetVal = CatSDumpHex (RetVal, 4, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
+    TempRetVal = InCatSDumpHex (RetVal, 4, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
     RetVal     = TempRetVal;
   }
 

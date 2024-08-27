@@ -46,6 +46,7 @@
   HiiLib
   SortLib
   PeCoffGetEntryPointLib
+ 
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
