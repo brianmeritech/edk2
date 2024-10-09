@@ -57,6 +57,7 @@ ShellAppMain (
   )
 {
   UINTN  Index;
+  UINT8  rc = 2;
   CHAR16 OpCmd[SIZE_ARGUMENT_MAX] = { 0, };
 
   //Print(L"Voltage Control Program for PCT3.0-GNRAP MRDIMM V%d.%d.%d %s\n",
@@ -64,7 +65,7 @@ ShellAppMain (
 
   if (Argc == 1) {
     PrintHelpMsg();
-    return 0;
+    return 1;
   }
 
   for (Index = 1; Index < Argc; Index++) {
@@ -86,11 +87,64 @@ ShellAppMain (
     else if (!StrCmp(OpCmd, L"-ID")) {  //Get ID 
 
     }
+  }
+  else if (Argc == 3) {
+    if (!StrCmp(OpCmd, L"-SL")) { // Set LED Status
+
+    }
+
+    if (!StrCmp(OpCmd, L"-GV")) { // Get Output voltage
+
+    }
+
+    if (!StrCmp(OpCmd, L"-GB")) { // Get Boot voltage
+
+    }
+
+    if (!StrCmp(OpCmd, L"-GC")) { // Get Memory Slot Count
+
+    }
+
+    if (!StrCmp(OpCmd, L"-SC")) { // Set Memory Slot Count Action
+
+    }
+
+    if (!StrCmp(OpCmd, L"-GF")) { // Get Fan RPM
+
+    }
+
+    if (!StrCmp(OpCmd, L"-P80")) { // Set Port 80
+
+    }
     else {
+      
       Print(L"  [ERROR] %s is not valid option.\n", OpCmd);
     }
   }
-  
+  else if (Argc == 4) {
+    
+    if (!StrCmp(OpCmd, L"-SV")) { // Set Output Voltage
+
+    }
+
+    if (!StrCmp(OpCmd, L"-BV")) { // Set Boot Voltage
+
+    }
+
+    if (!StrCmp(OpCmd, L"-FS")) { // Set Fan Speed
+
+    }  
+ 
+  }
+  else {
+    PrintHelpMsg();
+    return 255;
+  }
+
+  if (rc == 2) {
+    Print(L"  [ERROR] %s is not valid option.\n", OpCmd);
+  }
+
   return 0;
 }
 
