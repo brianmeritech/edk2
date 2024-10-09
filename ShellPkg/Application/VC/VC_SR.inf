@@ -17,7 +17,7 @@
   FILE_GUID                      = FD7E2E29-C193-456e-9B1C-C40A4C47BA32
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = UefiMain
+  ENTRY_POINT                    = ShellCEntryLib
 
 #
 # The following information is for reference only and not required by the build
@@ -36,11 +36,10 @@
   ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
-  UefiApplicationEntryPoint
   UefiLib
   ShellLib
-  HandleParsingLib
-  FileHandleLib
+  ShellCEntryLib
+
 
 [Guids]
 

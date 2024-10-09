@@ -161,6 +161,7 @@
   ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyApp.inf
   ShellPkg/Application/AcpiViewApp/AcpiViewApp.inf
   ShellPkg/Application/SerialTest/SerialTest.inf
-
+  ShellPkg/Application/VC/VC_SR.inf
+  
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
