@@ -6,8 +6,9 @@
 
 **/
 
+
+#include <Library\SerialPortLib.h>
 #include "VC.h"
-#include "SF.h"
 
 #define	RECV_BUFF_SIZE						      1024
 #define	SIZE_CMD_PACKET						      8
@@ -33,14 +34,10 @@
 #define CMD_SET_PWM_PULSE_WIDTH		      0x68
 
 
-
-/* Function Implement */
-
 EFI_STATUS
-Init_Serial_Func(
+Init_SerialPort(
   void
 )
 {
-  EFI_STATUS Status;
-  return Status = InitSerialFunc();
+  return SerialPortInitialize();
 }

@@ -29,8 +29,6 @@
 [Sources]
   VC.c
   VC.h
-  SF.c
-  SF.h
   MF.c
   MF.h
 
@@ -45,17 +43,15 @@
   ShellCEntryLib
   BaseLib
   IoLib
-  DevicePathLib
-
+  SerialPortLib
+  
 
 [Guids]
 
 [Ppis]
 
 [Protocols]
-  gEfiSerialIoProtocolGuid
-  gEfiDevicePathProtocolGuid
-
+  
 [FeaturePcd]
 
 [Pcd]

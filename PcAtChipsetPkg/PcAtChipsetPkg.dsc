@@ -44,6 +44,7 @@
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
 
 [Components]
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf

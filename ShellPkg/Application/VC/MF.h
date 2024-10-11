@@ -3,11 +3,9 @@
 
 
 EFI_STATUS
-Init_Serial_Func(
+Init_SerialPort(
   void
 );
-
-
 
 
 #endif
