@@ -29,6 +29,10 @@
 [Sources]
   VC.c
   VC.h
+  SF.c
+  SF.h
+  MF.c
+  MF.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,6 +44,7 @@
   ShellLib
   ShellCEntryLib
   BaseLib
+  IoLib
 
 
 [Guids]

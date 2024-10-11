@@ -7,25 +7,7 @@
 
 **/
 
-#include <Uefi.h>
-#include <Library/UefiLib.h>
-#include <Library/BaseLib.h>
-#include <Library/IoLib.h>
-#include <Library/ShellCEntryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-
 #include "IPReader.h"
-
-
-/*Function Declaration*/
-void PrintHelpMsg(
-  void
-);
-
-void ToUpperCase(
-  CHAR16* src,
-  CHAR16* dest
-);
 
 /**
   UEFI application entry point which has an interface similar to a

@@ -7,13 +7,7 @@
 
 **/
 
-#include <Uefi.h>
-#include <Library/UefiLib.h>
-#include <Library/DebugLib.h>
-#include <Library/ShellCEntryLib.h>
-#include <Library/BaseLib.h>
-#include <Library/IoLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+
 
 #include "IDReader.h"
 

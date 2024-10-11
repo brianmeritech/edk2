@@ -1,13 +1,21 @@
 #ifndef ID_READER_H_
 #define ID_READER_H_
 
+#include <Uefi.h>
+#include <Library/UefiLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ShellCEntryLib.h>
+#include <Library/BaseLib.h>
+#include <Library/IoLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
 /*******************************************************************************
  *	Date		  Version		Comment
  *	24/10/11	V0.1.0		Initial Version
  ******************************************************************************/
 #define VERSION_MAJOR						0
-#define VERSION_MINOR						0
-#define VERSION_BUILD					  1
+#define VERSION_MINOR						1
+#define VERSION_BUILD					  0
 
 #define MAX_TRY_CNT							5
 
@@ -29,7 +37,16 @@
 #define BOARD_SN							  1
 #define BOARD_ID							  2
 
+/*Function declaration*/
+void
+PrintHelpMsg(
+  void
+);
 
+void ToUpperCase(
+  CHAR16*,
+  CHAR16*
+);
 
 
 

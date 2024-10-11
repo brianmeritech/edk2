@@ -6,16 +6,25 @@
   
 **/
 
-#include <Uefi.h>
-#include <Library/BaseLib.h>
-#include <Library/UefiLib.h>
-#include <Library/DebugLib.h>
-#include <Library/ShellCEntryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-
 #include "VC.h"
+#include "MF.h"
 
-/*Definition*/
+/*******************************************************************************
+ *	Date		Version		Comment
+ *	24/10/09	V0.1.0		Initial Version
+ ******************************************************************************/
+#define	VERSION_MAJOR						        0			// Major version
+#define	VERSION_MINOR						        1			// Minor version 1
+#define	VERSION_BUILD						        0			// Build version 
+
+#define MAX_TRY_CNT							        5			// Maximum retry count for All command
+#define	SIZE_ARGUMENT_MAX				        16		// Maximum command string count
+
+//--- Define VDD, VPP MIN/MAX voltages
+#define	MIN_VDD								          4250	// Min. VDD volt = 4.25V
+#define	MAX_VDD								          15000	// Max. VDD volt = 15.00V
+#define MIN_P3_3V							          3000	// Min. P3.3 volt = 3.0V
+#define MAX_P3_3V							          3600	// Max. P3.3 volt = 3.6V
 
 /*Function declaration*/
 void
@@ -23,18 +32,11 @@ PrintHelpMsg(
   void
 );
 
-
-/**
- * @brief  convert string to upper case
- * @note
- * @param  *src: source string
- * @param  *dest: converted string
- * @retval None
- */
 void ToUpperCase(
   CHAR16*,
-  CHAR16* 
+  CHAR16*
 );
+
 
 /**
   UEFI application entry point which has an interface similar to a
@@ -69,6 +71,7 @@ ShellAppMain (
     return Status;
   }
 
+  // Test for shell UI debug use
   for (Index = 1; Index < Argc; Index++) {
         Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
   }
@@ -146,6 +149,7 @@ ShellAppMain (
 
   return Status;
 }
+
 
 
 void PrintHelpMsg()

@@ -1,6 +1,14 @@
 #ifndef IP_READER_H_
 #define IP_READER_H_
 
+#include <Uefi.h>
+#include <Library/UefiLib.h>
+#include <Library/BaseLib.h>
+#include <Library/IoLib.h>
+#include <Library/ShellCEntryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+
 /*******************************************************************************
  *	Date		  Version		Comment
  *	24/10/11  V0.1.0		Initial Version 
@@ -28,8 +36,16 @@
 #define TYPE_SUBNET_MASK				2
 #define TYPE_GATEWAY						3
 
+ /*Function declaration*/
+void
+PrintHelpMsg(
+  void
+);
 
-
+void ToUpperCase(
+  CHAR16*,
+  CHAR16*
+);
 
 
 
