@@ -11,6 +11,7 @@
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ShellCEntryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include "VC.h"
 
@@ -56,16 +57,16 @@ ShellAppMain (
   IN CHAR16  **Argv
   )
 {
+  EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   UINTN  Index;
-  UINT8  rc = 2;
   CHAR16 OpCmd[SIZE_ARGUMENT_MAX] = { 0, };
 
-  //Print(L"Voltage Control Program for PCT3.0-GNRAP MRDIMM V%d.%d.%d %s\n",
-  //  VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
+  Print(L"Voltage Control Program for PCT3.0 GNRAP MRDIMM V%d.%d.%d %s\n",
+      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
 
   if (Argc == 1) {
     PrintHelpMsg();
-    return 1;
+    return Status;
   }
 
   for (Index = 1; Index < Argc; Index++) {
@@ -87,6 +88,7 @@ ShellAppMain (
     else if (!StrCmp(OpCmd, L"-ID")) {  //Get ID 
 
     }
+ 
   }
   else if (Argc == 3) {
     if (!StrCmp(OpCmd, L"-SL")) { // Set LED Status
@@ -116,10 +118,7 @@ ShellAppMain (
     if (!StrCmp(OpCmd, L"-P80")) { // Set Port 80
 
     }
-    else {
-      
-      Print(L"  [ERROR] %s is not valid option.\n", OpCmd);
-    }
+   
   }
   else if (Argc == 4) {
     
@@ -138,14 +137,14 @@ ShellAppMain (
   }
   else {
     PrintHelpMsg();
-    return 255;
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (rc == 2) {
+  if (EFI_ERROR(Status)) {
     Print(L"  [ERROR] %s is not valid option.\n", OpCmd);
   }
 
-  return 0;
+  return Status;
 }
 
 

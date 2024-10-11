@@ -39,6 +39,8 @@
   UefiLib
   ShellLib
   ShellCEntryLib
+  BaseLib
+  IoLib
 
 
 [Guids]

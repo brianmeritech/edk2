@@ -11,8 +11,23 @@
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ShellCEntryLib.h>
+#include <Library/BaseLib.h>
+#include <Library/IoLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include "IDReader.h"
+
+/*Function Declaration*/
+
+void PrintHelpMsg(
+  void
+);
+
+void ToUpperCase(
+  CHAR16* src,
+  CHAR16* dest
+);
+
 /**
   UEFI application entry point which has an interface similar to a
   standard C main function.
@@ -34,15 +49,76 @@ ShellAppMain (
   IN CHAR16  **Argv
   )
 {
+  EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   UINTN  Index;
+  CHAR16 OpCmd1[SIZE_CMD_ARGS] = { 0, };
+  CHAR16 OpCmd2[SIZE_CMD_ARGS] = { 0, };
 
-  if (Argc == 1) {
-    Print (L"Argv[1] = NULL\n");
+
+  Print(L"IDReader for PCT3.0 GNRAP MRDIMM V%d.%d.%d %s\n",
+      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
+
+  if (Argc == 1 || Argc > 4) {
+    PrintHelpMsg();
+    return Status;
   }
+
+  ToUpperCase(Argv[1], OpCmd1);
 
   for (Index = 1; Index < Argc; Index++) {
-    Print (L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
+    Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
   }
 
-  return 0;
+  if (!StrCmp(OpCmd1, L"-CC")) {          // Check Connection
+    //TBD
+
+  }
+  else if (!StrCmp(OpCmd1, L"-R")) {      // Read Board ID
+    if (Argc < 3) {
+      Print(L"  [ERROR] Not enough command options.\n");
+    }
+    else {
+      ToUpperCase(Argv[1], OpCmd2);
+      if (!StrCmp(OpCmd2, L"-SN")) {      // Read Board SN
+        //TBD
+
+
+      }
+      else if (!StrCmp(OpCmd2, L"-ID")) { //Read Board ID
+        //TBD
+
+
+      }
+    }
+  }     
+
+
+  if (EFI_ERROR(Status)) {
+   
+  }
+
+  return Status;
+}
+
+void PrintHelpMsg(void)
+{
+  Print(L"Copyright (c) 1996 - 2024, Meritech Corporation. All rights reserved \n");
+  Print(L"  usage : IDREADER [-R/W] [-SN/-ID] <ID String>\n");
+  Print(L"          IDREADER -CC     (Check connection)\n");
+  Print(L"          IDREADER -R -SN  (Read Bd ID -> EP_R_ID.TXT)\n");
+  Print(L"          IDREADER -R -ID  (Read Bd SN -> EP_R_SN.TXT)\n");
+  Print(L"          IDREADER -W -SN  Serial Number (Write Bd SN )\n");
+  Print(L"          IDREADER -W -ID  ID            (Write Bd ID )\n");
+}
+
+void ToUpperCase(CHAR16* src, CHAR16* dest)
+{
+  if (src == NULL || dest == NULL)
+    return;
+
+  while (*src) {
+    *dest = CharToUpper(*src);
+    src++;
+    dest++;
+  }
 }
