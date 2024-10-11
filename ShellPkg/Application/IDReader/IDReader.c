@@ -90,11 +90,29 @@ ShellAppMain (
 
       }
     }
-  }     
+  }
+  else if (!Strcmp(OpCmd1, L"-W")) {
+    if (Argc < 4) {
+      Print("  [ERROR] Not enough command options.\n");
+      
+    }
+    else {
+      ToUpperCase(Argv[2], OpCmd2);
+      if (!StrCmp(OpCmd2, L"-SN")) {      //Write Board SN
+        // TBD
+
+      }
+      else if (!StrCmp(OpCmd2, L"-ID")) { //Write Board ID
+        //TBD 
+      }
+    }
+  }
+
 
 
   if (EFI_ERROR(Status)) {
-   
+
+    Print("  [ERROR] %s is not valid command.\n", OpCmd2);
   }
 
   return Status;
