@@ -91,10 +91,9 @@ ShellAppMain (
       }
     }
   }
-  else if (!Strcmp(OpCmd1, L"-W")) {
+  else if (!StrCmp(OpCmd1, L"-W")) {
     if (Argc < 4) {
-      Print("  [ERROR] Not enough command options.\n");
-      
+      Print(L"  [ERROR] Not enough command options.\n");      
     }
     else {
       ToUpperCase(Argv[2], OpCmd2);
@@ -111,8 +110,7 @@ ShellAppMain (
 
 
   if (EFI_ERROR(Status)) {
-
-    Print("  [ERROR] %s is not valid command.\n", OpCmd2);
+    Print(L"  [ERROR] %s %s are not valid command.\n", OpCmd1, OpCmd2);    
   }
 
   return Status;
