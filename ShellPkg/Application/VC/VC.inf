@@ -45,6 +45,7 @@
   ShellCEntryLib
   BaseLib
   IoLib
+  DevicePathLib
 
 
 [Guids]
@@ -53,6 +54,7 @@
 
 [Protocols]
   gEfiSerialIoProtocolGuid
+  gEfiDevicePathProtocolGuid
 
 [FeaturePcd]
 

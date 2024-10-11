@@ -150,8 +150,7 @@ ShellAppMain (
   return Status;
 }
 
-
-
+/* Function Implement */
 void PrintHelpMsg()
 {
   Print(L"Copyright (c) 1996 - 2024, Meritech Corporation. All rights reserved \n");

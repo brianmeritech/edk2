@@ -31,3 +31,16 @@
 #define CMD_SET_VOLTAGE_TUNE			      0x66
 #define CMD_SET_ADC_TUNE					      0x67
 #define CMD_SET_PWM_PULSE_WIDTH		      0x68
+
+
+
+/* Function Implement */
+
+EFI_STATUS
+Init_Serial_Func(
+  void
+)
+{
+  EFI_STATUS Status;
+  return Status = InitSerialFunc();
+}
