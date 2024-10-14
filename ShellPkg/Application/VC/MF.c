@@ -95,7 +95,6 @@ InitSerialPort(
   return SerialPortInitialize();
 }
 
-
 EFI_STATUS
 CheckConnect(
   void

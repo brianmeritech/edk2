@@ -1,4 +1,4 @@
-/** @file
+﻿/** @file
   This is a test application that demonstrates how to use the C-style entry point
   for a shell application.
 
@@ -26,9 +26,8 @@
 #define MIN_P3_3V							          3000	// Min. P3.3 volt = 3.0V
 #define MAX_P3_3V							          3600	// Max. P3.3 volt = 3.6V
 
-EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystemProtocol;
-EFI_FILE_PROTOCOL*  gFileProtocol;
-
+EFI_FILE_PROTOCOL* gRoot = NULL;
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
 
 /*Function declaration*/
 void
@@ -41,6 +40,10 @@ void ToUpperCase(
   CHAR16*
 );
 
+EFI_STATUS
+InitFileHandle(
+  void
+);
 
 /**
   UEFI application entry point which has an interface similar to a
@@ -74,10 +77,13 @@ ShellAppMain (
   Status = InitSerialPort();
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to configure Serial Port %r \n", Status);
- 
-  if (Argc == 2) {
   }
-    
+
+  Status = InitFileHandle();
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Get File Handle %r \n", Status);
+  }
+
   if (Argc == 1) {
     PrintHelpMsg();
     return Status;
@@ -89,6 +95,8 @@ ShellAppMain (
   }
 
   ToUpperCase(Argv[1], OpCmd);
+
+  if(Argc == 2) {
     if (!StrCmp(OpCmd, L"-H")) {
         PrintHelpMsg();
     }
@@ -114,7 +122,6 @@ ShellAppMain (
     else if (!StrCmp(OpCmd, L"-ID")) {  //Get ID 
 
     }
- 
   }
   else if (Argc == 3) {
     if (!StrCmp(OpCmd, L"-SL")) { // Set LED Status
@@ -174,7 +181,10 @@ ShellAppMain (
 }
 
 /* Function Implement */
-void PrintHelpMsg()
+void
+PrintHelpMsg(
+  void
+)
 {
   Print(L"Copyright (c) 1996 - 2024, Meritech Corporation. All rights reserved \n");
   Print(L"  Usage : VC [command] [ch] [mVolt]\n");
@@ -201,7 +211,11 @@ void PrintHelpMsg()
   Print(L"  FAN_SPEED : 3 ~ 10\n");
 }
 
-void ToUpperCase(CHAR16* src, CHAR16* dest)
+void
+ToUpperCase(
+  CHAR16* src,
+  CHAR16* dest
+)
 {
   if (src == NULL || dest == NULL)
     return;
@@ -211,4 +225,35 @@ void ToUpperCase(CHAR16* src, CHAR16* dest)
     src++;
     dest++;
   }
+}
+
+EFI_STATUS
+InitFileHandle(
+  void
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  Status = gBS->LocateProtocol(
+    &gEfiSimpleFileSystemProtocolGuid,
+    NULL,
+    (VOID**)&gSimpleFileSystem
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open File System\n");
+    return Status;
+  }
+
+  Status = gSimpleFileSystem->OpenVolume(
+    gSimpleFileSystem,
+    &gRoot
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open Root\n");
+    return Status;
+  }
+
+  return Status;
 }
