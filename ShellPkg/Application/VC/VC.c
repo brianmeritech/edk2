@@ -26,6 +26,10 @@
 #define MIN_P3_3V							          3000	// Min. P3.3 volt = 3.0V
 #define MAX_P3_3V							          3600	// Max. P3.3 volt = 3.6V
 
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystemProtocol;
+EFI_FILE_PROTOCOL*  gFileProtocol;
+
+
 /*Function declaration*/
 void
 PrintHelpMsg(
@@ -67,9 +71,11 @@ ShellAppMain (
       VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
 
   ///* change to BIOS ? TBD
-  Status = Init_SerialPort();
+  Status = InitSerialPort();
   if (EFI_ERROR(Status)) {
-    Print(L"Failed to configure Serial Port %r \n", Status);
+    Print(L"  Failed to configure Serial Port %r \n", Status);
+ 
+  if (Argc == 2) {
   }
     
   if (Argc == 1) {
@@ -83,22 +89,27 @@ ShellAppMain (
   }
 
   ToUpperCase(Argv[1], OpCmd);
- 
-  if (Argc == 2) {
     if (!StrCmp(OpCmd, L"-H")) {
         PrintHelpMsg();
     }
     else if (!StrCmp(OpCmd, L"-CC")) {  //Check Connect
       Status = CheckConnect();
-      if (EFI_ERROR(Status)) {
-        Print(L"  Connection Error!\n");
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Connection Ok!\n");
       }
       else {
-        Print(L"  Connection Ok!\n");
+        Print(L"  Connection Error!\n");
       }
     }
     else if (!StrCmp(OpCmd, L"-GR")) {  //Get Firwmare Version
-
+      UINT8 V1, V2, V3;
+      Status = GetFWVersion(&V1, &V2, &V3);
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Firmware version : [%d.%d.%d] OK\n", V1, V2, V3);
+      }
+      else {
+        Print(L"  [ERROR] Get Firmware version\n");
+      }
     }
     else if (!StrCmp(OpCmd, L"-ID")) {  //Get ID 
 

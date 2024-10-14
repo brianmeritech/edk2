@@ -22,8 +22,8 @@
 #define DT1_INDX                        2
 #define DT2_INDX                        3
 #define DT3_INDX                        4
-#define DT5_INDX                        5
-#define DT6_INDX                        6
+#define DT4_INDX                        5
+#define DT5_INDX                        6
 #define ETX_INDX                        7
 
 // --- Command Definition
@@ -119,7 +119,7 @@ SetP80(
   UINTN Dat
 )
 {
-  Init_TxPkt();
+  InitTxPkt();
   gTxPkt[CMD_INDX] = CMD_PORT80_DATA;
   gTxPkt[DT1_INDX] = (UINT8)Dat & 0x0F;         //Low Byte
   gTxPkt[DT2_INDX] = ((UINT8)Dat & 0xF0) >> 4;  //High Byte
@@ -127,4 +127,27 @@ SetP80(
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 }
 
+EFI_STATUS
+GetFWVersion(
+  UINT8* pV1,
+  UINT8* pV2,
+  UINT8* pV3
+)
+{
+  InitTxPkt();
+  InitRxPkt();
+
+  gTxPkt[CMD_INDX] = CMD_GET_FW_VERSION;
+  gTxPkt[DT1_INDX] = 1; //Main MCU FW
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == GET_FW_VERSION_DONE)
+      *pV1 = gRxPkt[DT2_INDX];
+      *pV2 = gRxPkt[DT3_INDX];
+      *pV3 = gRxPkt[DT4_INDX];
+      return EFI_SUCCESS;
+  }
+  return EFI_NOT_READY;
+}
 

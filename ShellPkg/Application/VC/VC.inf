@@ -45,14 +45,14 @@
   IoLib
   SerialPortLib
   BaseMemoryLib
+  FileHandleLib
   
-
 [Guids]
 
 [Ppis]
 
 [Protocols]
-  
+  gEfiSimpleFileSystemProtocolGuid
 [FeaturePcd]
 
 [Pcd]
