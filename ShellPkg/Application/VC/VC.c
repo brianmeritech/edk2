@@ -305,9 +305,8 @@ GetIDFunc(
   );
 
   if (EFI_ERROR(Status)) {
-    Print(L"  Failed to write VOLTDEV\n");
+    Print(L"  Failed to write VOLTDEV.txt\n");
   }
-
 
   Status = VoltFile->Close(VoltFile);
   SetMem(str, bufSize, 0);
@@ -334,6 +333,10 @@ GetIDFunc(
       &bufSize,
       SlotStr
     );
+
+    if (EFI_ERROR(Status)) {
+      Print(L"  Failed to write SPCLED.txt\n");
+    }
   }
 
   Status = SpcFile->Close(SpcFile);
