@@ -10,10 +10,21 @@
 #include <Library\SerialPortLib.h>
 #include "VC.h"
 
+#define RETRY                           5
+
 #define	RECV_BUFF_SIZE						      1024
 #define	SIZE_CMD_PACKET						      8
 #define STX									            0x02
 #define ETX									            0x03
+
+#define STX_INDX                        0
+#define CMD_INDX                        1
+#define DT1_INDX                        2
+#define DT2_INDX                        3
+#define DT3_INDX                        4
+#define DT5_INDX                        5
+#define DT6_INDX                        6
+#define ETX_INDX                        7
 
 // --- Command Definition
 #define CMD_CHECK_CONNECTION			      0x41
@@ -33,38 +44,87 @@
 #define CMD_SET_ADC_TUNE					      0x67
 #define CMD_SET_PWM_PULSE_WIDTH		      0x68
 
+#define CHECK_CONNECTION_DONE           0x81
+#define GET_FW_VERSION_DONE             0x91
+
+
+
 UINT8 gTxPkt[SIZE_CMD_PACKET];
 UINT8 gRxPkt[SIZE_CMD_PACKET];
 
 EFI_STATUS
-Init_SerialPort(
+ReadUartData(
   void
 )
 {
-
-  return SerialPortInitialize();
+  for (UINT8 i = 0; i < RETRY; i++) {
+    if (SerialPortPoll()) {
+      if (SerialPortRead(gRxPkt, SIZE_CMD_PACKET))
+        return EFI_SUCCESS;
+      else
+        return EFI_NOT_FOUND;
+    }
+    gBS->Stall(150);
+  }
+  return EFI_NOT_FOUND;
 }
 
-void Init_TxPkt()
+void
+InitTxPkt(
+  void
+)
 {
   SetMem(gTxPkt, SIZE_CMD_PACKET, 0);
-  gTxPkt[0] = STX;
-  gTxPkt[7] = ETX;
+  gTxPkt[STX_INDX] = STX;
+  gTxPkt[ETX_INDX] = ETX;
 }
 
-void Init_RxPkt()
+void
+InitRxPkt(
+  void
+)
 {
   SetMem(gRxPkt, SIZE_CMD_PACKET, 0);
 }
 
-
-void SetP80(UINTN Dat)
+EFI_STATUS
+InitSerialPort(
+  void
+)
 {
-  Init_TxPkt();
-  gTxPkt[1] = CMD_PORT80_DATA;
-  gTxPkt[2] = (UINT8)Dat & 0x0F;
-  gTxPkt[3] = ((UINT8)Dat & 0xF0) >> 4;
+  return SerialPortInitialize();
+}
 
+
+EFI_STATUS
+CheckConnect(
+  void
+)
+{
+  InitTxPkt();
+  InitRxPkt();
+
+  gTxPkt[CMD_INDX] = CMD_CHECK_CONNECTION;
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == CHECK_CONNECTION_DONE)
+      return EFI_SUCCESS;
+  }
+  return EFI_NOT_READY;  
 }
+
+void
+SetP80(
+  UINTN Dat
+)
+{
+  Init_TxPkt();
+  gTxPkt[CMD_INDX] = CMD_PORT80_DATA;
+  gTxPkt[DT1_INDX] = (UINT8)Dat & 0x0F;         //Low Byte
+  gTxPkt[DT2_INDX] = ((UINT8)Dat & 0xF0) >> 4;  //High Byte
+
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+}
+
+

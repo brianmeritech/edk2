@@ -3,13 +3,27 @@
 
 
 EFI_STATUS
-Init_SerialPort(
+InitSerialPort(
   void
 );
 
+EFI_STATUS
+CheckConnect(
+  void
+);
+
+EFI_STATUS
+GetFWVersion(
+  UINT8*,
+  UINT8*,
+  UINT8*
+);
 
 void SetP80(
   UINTN
 );
+
+
+
 
 #endif

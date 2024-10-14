@@ -89,7 +89,13 @@ ShellAppMain (
         PrintHelpMsg();
     }
     else if (!StrCmp(OpCmd, L"-CC")) {  //Check Connect
-
+      Status = CheckConnect();
+      if (EFI_ERROR(Status)) {
+        Print(L"  Connection Error!\n");
+      }
+      else {
+        Print(L"  Connection Ok!\n");
+      }
     }
     else if (!StrCmp(OpCmd, L"-GR")) {  //Get Firwmare Version
 
