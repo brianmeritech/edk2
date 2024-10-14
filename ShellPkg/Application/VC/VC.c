@@ -125,7 +125,7 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-P80")) { // Set Port 80
-
+      SetP80(StrHexToUintn(Argv[2]));
     }
    
   }

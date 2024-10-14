@@ -8,4 +8,8 @@ Init_SerialPort(
 );
 
 
+void SetP80(
+  UINTN
+);
+
 #endif

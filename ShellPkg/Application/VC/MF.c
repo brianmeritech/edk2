@@ -56,3 +56,15 @@ void Init_RxPkt()
 {
   SetMem(gRxPkt, SIZE_CMD_PACKET, 0);
 }
+
+
+void SetP80(UINTN Dat)
+{
+  Init_TxPkt();
+  gTxPkt[1] = CMD_PORT80_DATA;
+  gTxPkt[2] = (UINT8)Dat & 0x0F;
+  gTxPkt[3] = ((UINT8)Dat & 0xF0) >> 4;
+
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+}
