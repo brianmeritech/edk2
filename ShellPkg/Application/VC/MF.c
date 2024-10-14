@@ -33,11 +33,26 @@
 #define CMD_SET_ADC_TUNE					      0x67
 #define CMD_SET_PWM_PULSE_WIDTH		      0x68
 
+UINT8 gTxPkt[SIZE_CMD_PACKET];
+UINT8 gRxPkt[SIZE_CMD_PACKET];
 
 EFI_STATUS
 Init_SerialPort(
   void
 )
 {
+
   return SerialPortInitialize();
+}
+
+void Init_TxPkt()
+{
+  SetMem(gTxPkt, SIZE_CMD_PACKET, 0);
+  gTxPkt[0] = STX;
+  gTxPkt[7] = ETX;
+}
+
+void Init_RxPkt()
+{
+  SetMem(gRxPkt, SIZE_CMD_PACKET, 0);
 }

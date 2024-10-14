@@ -43,7 +43,7 @@
 // ---------------------------------------------
 // UART Settings
 // ---------------------------------------------
-UINT16  gUartBase = 0x2F8;
+UINT16  gUartBase = 0x2F8;  //change for PCT3.0 GNR-AP MRDIMM  
 UINTN   gBps      = 115200;
 UINT8   gData     = 8;
 UINT8   gStop     = 1;

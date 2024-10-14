@@ -7,6 +7,7 @@
 #include <Library/IoLib.h>
 #include <Library/UefiLib.h>
 #include <Library/ShellCEntryLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 

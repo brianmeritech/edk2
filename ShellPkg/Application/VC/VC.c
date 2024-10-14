@@ -66,6 +66,12 @@ ShellAppMain (
   Print(L"Voltage Control Program for PCT3.0 GNRAP MRDIMM V%d.%d.%d %s\n",
       VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
 
+  ///* change to BIOS ? TBD
+  Status = Init_SerialPort();
+  if (EFI_ERROR(Status)) {
+    Print(L"Failed to configure Serial Port %r \n", Status);
+  }
+    
   if (Argc == 1) {
     PrintHelpMsg();
     return Status;
@@ -77,7 +83,7 @@ ShellAppMain (
   }
 
   ToUpperCase(Argv[1], OpCmd);
-
+ 
   if (Argc == 2) {
     if (!StrCmp(OpCmd, L"-H")) {
         PrintHelpMsg();
