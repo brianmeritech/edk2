@@ -6,6 +6,7 @@
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
 #include <Library/UefiLib.h>
+#include <Library/PrintLib.h>
 #include <Library/FileHandleLib.h>
 #include <Library/ShellCEntryLib.h>
 #include <Library/BaseMemoryLib.h>

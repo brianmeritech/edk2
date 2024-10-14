@@ -45,6 +45,11 @@ InitFileHandle(
   void
 );
 
+void
+GetIDFunc(
+  void
+);
+
 /**
   UEFI application entry point which has an interface similar to a
   standard C main function.
@@ -77,11 +82,6 @@ ShellAppMain (
   Status = InitSerialPort();
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to configure Serial Port %r \n", Status);
-  }
-
-  Status = InitFileHandle();
-  if (EFI_ERROR(Status)) {
-    Print(L"  Failed to Get File Handle %r \n", Status);
   }
 
   if (Argc == 1) {
@@ -120,7 +120,7 @@ ShellAppMain (
       }
     }
     else if (!StrCmp(OpCmd, L"-ID")) {  //Get ID 
-
+      GetIDFunc();
     }
   }
   else if (Argc == 3) {
@@ -256,4 +256,88 @@ InitFileHandle(
   }
 
   return Status;
+}
+
+void
+GetIDFunc(
+  void
+)
+{
+  EFI_STATUS Status;
+  EFI_FILE_PROTOCOL* VoltFile;
+  EFI_FILE_PROTOCOL* SpcFile;
+
+  CHAR8 str[50] = { 0 };
+  CHAR8 SlotStr[10] = { 0 };
+  UINTN bufSize=sizeof(str);
+  UINT8 V1, V2, V3;
+
+  Status = InitFileHandle();
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Get File Handle %r \n", Status);
+  }
+
+  gRoot->Open(
+    gRoot,
+    &VoltFile,
+    L"VOLTDEV.TXT",
+    EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+    0
+  );
+
+  Status = GetFWVersion(&V1, &V2, &V3);
+  AsciiSPrint(
+    str,
+    bufSize,
+    "VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n",
+    VERSION_MAJOR,
+    VERSION_MINOR,
+    VERSION_BUILD,
+    V1,
+    V2,
+    V3
+  );
+
+  Status = VoltFile->Write(
+    VoltFile,
+    &bufSize,
+    str
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to write VOLTDEV\n");
+  }
+
+
+  Status = VoltFile->Close(VoltFile);
+  SetMem(str, bufSize, 0);
+
+  gRoot->Open(
+    gRoot,
+    &SpcFile,
+    L"SPCLED.TXT",
+    EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+    0
+  );
+
+  for (UINT8 i = 1; i < 9; i++) {
+    bufSize = sizeof(SlotStr);
+    AsciiSPrint(
+      SlotStr,
+      bufSize,
+      "Slot%d B\n",
+      i
+    );
+
+    Status = SpcFile->Write(
+      SpcFile,
+      &bufSize,
+      SlotStr
+    );
+  }
+
+  Status = SpcFile->Close(SpcFile);
+
+  Print(L"  Set CPX_VC -SL BBBBBBBB and Create VOLTDEV.TXT & SPCLED.TXT Ok!\n\n");
+
 }
