@@ -46,6 +46,7 @@
 
 #define CHECK_CONNECTION_DONE           0x81
 #define GET_FW_VERSION_DONE             0x91
+#define GET_FAN_RPM_DONE                0x96
 
 
 
@@ -141,12 +142,48 @@ GetFWVersion(
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
   if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == GET_FW_VERSION_DONE)
+    if (gRxPkt[CMD_INDX] == GET_FW_VERSION_DONE) {
       *pV1 = gRxPkt[DT2_INDX];
       *pV2 = gRxPkt[DT3_INDX];
       *pV3 = gRxPkt[DT4_INDX];
       return EFI_SUCCESS;
+    }
   }
   return EFI_NOT_READY;
 }
 
+UINT16
+GetFanRPM(
+  UINTN FAN
+)
+{
+  UINT16 tRPM = 0;
+
+  InitTxPkt();
+  InitRxPkt();
+
+  gTxPkt[CMD_INDX] = CMD_GET_FAN_RPM;
+  gTxPkt[DT1_INDX] = (UINT8)FAN;
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == GET_FAN_RPM_DONE) {
+      tRPM = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
+      return tRPM;
+    }    
+  }
+
+  return 0;
+}
+
+EFI_STATUS
+SetLEDStatus(
+  CHAR16* LedSta
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+
+
+  return Status;
+}

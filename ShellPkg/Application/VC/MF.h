@@ -19,11 +19,19 @@ GetFWVersion(
   UINT8*
 );
 
-void SetP80(
+void
+SetP80(
   UINTN
 );
 
+UINT16
+GetFanRPM(
+  UINTN
+);
 
-
+EFI_STATUS
+SetLEDStatus(
+  CHAR16*
+);
 
 #endif

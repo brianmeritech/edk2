@@ -1,4 +1,4 @@
-﻿/** @file
+/** @file
   This is a test application that demonstrates how to use the C-style entry point
   for a shell application.
 
@@ -125,7 +125,13 @@ ShellAppMain (
   }
   else if (Argc == 3) {
     if (!StrCmp(OpCmd, L"-SL")) { // Set LED Status
-
+      Status = SetLEDStatus(Argv[2]);
+      if (EFI_ERROR(Status)) {
+        Print(L"   [ERROR] Set LED Status %s", Argv[2]);
+      }
+      else {
+        Print(L"   Set LED Status %s Ok", Argv[2]);
+      }
     }
 
     if (!StrCmp(OpCmd, L"-GV")) { // Get Output voltage
@@ -145,7 +151,10 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-GF")) { // Get Fan RPM
-
+      UINT16 FanRPM = 0;
+      FanRPM = GetFanRPM(StrDecimalToUintn(Argv[2]));
+      if (FanRPM == 0) Print(L"  [ERROR] Get FAN RPM\n");
+      else Print(L"FAN RPM : RPM = % d\n", FanRPM);
     }
 
     if (!StrCmp(OpCmd, L"-P80")) { // Set Port 80
