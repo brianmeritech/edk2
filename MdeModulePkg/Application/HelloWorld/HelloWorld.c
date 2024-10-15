@@ -10,8 +10,8 @@
 #include <Uefi.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
-#include <Library/UefiApplicationEntryPoint.h>
 #include <Library/IoLib.h>
+#include <Library/UefiApplicationEntryPoint.h>
 
 #define COM2    0x3E8
 
