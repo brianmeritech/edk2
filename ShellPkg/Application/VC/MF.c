@@ -27,6 +27,7 @@
 #define ETX_INDX                        7
 
 #define MAX_LED_NUMBER                  8
+#define MAX_LED_TABLE                   2
 
 // --- Command Definition
 #define CMD_CHECK_CONNECTION			      0x41
@@ -40,7 +41,7 @@
 #define CMD_SET_OUT_VOLTAGE				      0x61
 #define CMD_SET_SLEW_RATE					      0x62
 #define CMD_SET_BOOT_VOLTAGE			      0x63
-#define CMD_SET_LED							        0x64
+#define CMD_SET_LED_STATUS			        0x64
 #define CMD_SET_MEM_COUNT_ACTION	      0x65
 #define CMD_SET_VOLTAGE_TUNE			      0x66
 #define CMD_SET_ADC_TUNE					      0x67
@@ -49,7 +50,7 @@
 #define CHECK_CONNECTION_DONE           0x81
 #define GET_FW_VERSION_DONE             0x91
 #define GET_FAN_RPM_DONE                0x96
-
+#define SET_LED_STATUS_DONE             0xA4
 
 
 UINT8 gTxPkt[SIZE_CMD_PACKET];
@@ -200,6 +201,25 @@ SetLEDStatus(
     }
   }
 
+  for (UINT8 i = 0; i < MAX_LED_TABLE; i++) {
+    InitTxPkt();
+    gTxPkt[CMD_INDX] = CMD_SET_LED_STATUS;
+    gTxPkt[DT1_INDX] = i;                     // 0: LED1~4 ; 1: LED5~8
+    gTxPkt[DT2_INDX] = LedTyp[i * 4];
+    gTxPkt[DT3_INDX] = LedTyp[i * 4 + 1];
+    gTxPkt[DT4_INDX] = LedTyp[i * 4 + 2];
+    gTxPkt[DT5_INDX] = LedTyp[i * 4 + 3];
+    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == SET_LED_STATUS_DONE) {
+        gBS->Stall(150);        
+      }
+      else {
+        Print(L"  [ERROR] Set LED Communication ERROR(%d)\n", i);
+      }
+    }
+  }
 
   return Status;
 }
