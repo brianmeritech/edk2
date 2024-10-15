@@ -74,9 +74,16 @@ ShellAppMain (
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   UINTN  Index;
   CHAR16 OpCmd[SIZE_ARGUMENT_MAX] = { 0, };
+  CHAR16 Date[12];
+  
+  UnicodeSPrintAsciiFormat(
+    &Date[0],
+    sizeof(Date),
+    __DATE__
+    );
 
   Print(L"Voltage Control Program for PCT3.0 GNRAP MRDIMM V%d.%d.%d %s\n",
-      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
+      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, Date);
 
   ///* change to BIOS ? TBD
   Status = InitSerialPort();
