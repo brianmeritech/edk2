@@ -19,11 +19,11 @@
 
 #define STX_INDX                        0
 #define CMD_INDX                        1
-#define DT1_INDX                        2
-#define DT2_INDX                        3
-#define DT3_INDX                        4
-#define DT4_INDX                        5
-#define DT5_INDX                        6
+#define DAT1_INDX                       2
+#define DAT2_INDX                       3
+#define DAT3_INDX                       4
+#define DAT4_INDX                       5
+#define DAT5_INDX                       6
 #define ETX_INDX                        7
 
 #define MAX_LED_NUMBER                  8
@@ -51,7 +51,7 @@
 #define GET_FW_VERSION_DONE             0x91
 #define GET_FAN_RPM_DONE                0x96
 #define SET_LED_STATUS_DONE             0xA4
-
+#define SET_FAN_PWM_DOEN                0xA8
 
 UINT8 gTxPkt[SIZE_CMD_PACKET];
 UINT8 gRxPkt[SIZE_CMD_PACKET];
@@ -124,8 +124,8 @@ SetP80(
 {
   InitTxPkt();
   gTxPkt[CMD_INDX] = CMD_PORT80_DATA;
-  gTxPkt[DT1_INDX] = (UINT8)Dat & 0x0F;         //Low Byte
-  gTxPkt[DT2_INDX] = ((UINT8)Dat & 0xF0) >> 4;  //High Byte
+  gTxPkt[DAT1_INDX] = (UINT8)Dat & 0x0F;         //Low Byte
+  gTxPkt[DAT2_INDX] = ((UINT8)Dat & 0xF0) >> 4;  //High Byte
 
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 }
@@ -141,14 +141,14 @@ GetFWVersion(
   InitRxPkt();
 
   gTxPkt[CMD_INDX] = CMD_GET_FW_VERSION;
-  gTxPkt[DT1_INDX] = 1; //Main MCU FW
+  gTxPkt[DAT1_INDX] = 1; //Main MCU FW
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
   if (!EFI_ERROR(ReadUartData())) {
     if (gRxPkt[CMD_INDX] == GET_FW_VERSION_DONE) {
-      *pV1 = gRxPkt[DT2_INDX];
-      *pV2 = gRxPkt[DT3_INDX];
-      *pV3 = gRxPkt[DT4_INDX];
+      *pV1 = gRxPkt[DAT2_INDX];
+      *pV2 = gRxPkt[DAT3_INDX];
+      *pV3 = gRxPkt[DAT4_INDX];
       return EFI_SUCCESS;
     }
   }
@@ -166,7 +166,7 @@ GetFanRPM(
   InitRxPkt();
 
   gTxPkt[CMD_INDX] = CMD_GET_FAN_RPM;
-  gTxPkt[DT1_INDX] = (UINT8)FAN;
+  gTxPkt[DAT1_INDX] = (UINT8)FAN;
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
   if (!EFI_ERROR(ReadUartData())) {
@@ -204,11 +204,11 @@ SetLEDStatus(
   for (UINT8 i = 0; i < MAX_LED_TABLE; i++) {
     InitTxPkt();
     gTxPkt[CMD_INDX] = CMD_SET_LED_STATUS;
-    gTxPkt[DT1_INDX] = i;                     // 0: LED1~4 ; 1: LED5~8
-    gTxPkt[DT2_INDX] = LedTyp[i * 4];
-    gTxPkt[DT3_INDX] = LedTyp[i * 4 + 1];
-    gTxPkt[DT4_INDX] = LedTyp[i * 4 + 2];
-    gTxPkt[DT5_INDX] = LedTyp[i * 4 + 3];
+    gTxPkt[DAT1_INDX] = i;                     // 0: LED1~4 ; 1: LED5~8
+    gTxPkt[DAT2_INDX] = LedTyp[i * 4];
+    gTxPkt[DAT3_INDX] = LedTyp[i * 4 + 1];
+    gTxPkt[DAT4_INDX] = LedTyp[i * 4 + 2];
+    gTxPkt[DAT5_INDX] = LedTyp[i * 4 + 3];
     SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
     if (!EFI_ERROR(ReadUartData())) {
@@ -219,6 +219,40 @@ SetLEDStatus(
         Print(L"  [ERROR] Set LED Communication ERROR(%d)\n", i);
       }
     }
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+SetFanSpeed(
+  UINTN Channel,
+  UINTN Speed
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  if (Channel == 0 || Channel > 3) {
+    Print(L"  [ERROR] Set F-SPD invalid FAN Channel : %d\n", Channel);
+    return Status;
+  }
+
+  if (Speed == 0 || Speed > 10) {
+    Print(L"  [ERROR] Set F-SPD invalid FAN Speed : %d\n", Speed);
+    return Status;
+  }
+
+  InitTxPkt();
+  gTxPkt[CMD_INDX] = CMD_SET_PWM_PULSE_WIDTH;
+  gTxPkt[DAT1_INDX] = (UINT8)Channel;
+  gTxPkt[DAT2_INDX] = (UINT8)Speed;
+
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == SET_FAN_PWM_DOEN) {
+      return EFI_SUCCESS;
+    }    
   }
 
   return Status;

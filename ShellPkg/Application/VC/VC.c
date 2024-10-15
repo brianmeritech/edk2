@@ -125,7 +125,9 @@ ShellAppMain (
   }
   else if (Argc == 3) {
     if (!StrCmp(OpCmd, L"-SL")) { // Set LED Status
-      Status = SetLEDStatus(Argv[2]);
+      Status = SetLEDStatus(
+        Argv[2]
+      );
       if (EFI_ERROR(Status)) {
         Print(L"   [ERROR] Set LED Status %s", Argv[2]);
       }
@@ -152,13 +154,17 @@ ShellAppMain (
 
     if (!StrCmp(OpCmd, L"-GF")) { // Get Fan RPM
       UINT16 FanRPM = 0;
-      FanRPM = GetFanRPM(StrDecimalToUintn(Argv[2]));
+      FanRPM = GetFanRPM(
+        StrDecimalToUintn(Argv[2])
+      );
       if (FanRPM == 0) Print(L"  [ERROR] Get FAN RPM\n");
       else Print(L"FAN RPM : RPM = % d\n", FanRPM);
     }
 
     if (!StrCmp(OpCmd, L"-P80")) { // Set Port 80
-      SetP80(StrHexToUintn(Argv[2]));
+      SetP80(
+        StrHexToUintn(Argv[2])
+      );
     }
    
   }
@@ -173,7 +179,22 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-FS")) { // Set Fan Speed
-
+      Status = SetFanSpeed(
+        StrHexToUintn(Argv[2]),
+        StrHexToUintn(Argv[3])
+      );
+      if (EFI_ERROR(Status)) {
+        Print(L"   Set FAN %d Speed %d OK\n",
+          StrHexToUintn(Argv[2]),
+          StrHexToUintn(Argv[3])
+        );
+      }
+      else {
+        Print(L"  [ERROR] Set FAN %d Spped %d\n",
+          StrHexToUintn(Argv[2]),
+          StrHexToUintn(Argv[3])
+        );
+      }
     }  
  
   }

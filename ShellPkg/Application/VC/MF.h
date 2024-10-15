@@ -34,4 +34,10 @@ SetLEDStatus(
   CHAR16*
 );
 
+EFI_STATUS
+SetFanSpeed(
+  UINTN,
+  UINTN
+);
+
 #endif
