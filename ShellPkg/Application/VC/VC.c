@@ -276,9 +276,9 @@ GetIDFunc(
   EFI_FILE_PROTOCOL* VoltFile;
   EFI_FILE_PROTOCOL* SpcFile;
 
-  CHAR8 str[50] = { 0 };
-  CHAR8 SlotStr[10] = { 0 };
-  UINTN bufSize=sizeof(str);
+  CHAR16 str[50];
+  CHAR16 SlotStr[10];
+  UINTN bufSize;
   UINT8 V1, V2, V3;
 
   Status = InitFileHandle();
@@ -294,11 +294,14 @@ GetIDFunc(
     0
   );
 
+  bufSize = sizeof(str);
+  SetMem(str, bufSize, 0);
+
   Status = GetFWVersion(&V1, &V2, &V3);
-  AsciiSPrint(
+  UnicodeSPrint(
     str,
     bufSize,
-    "VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n",
+    L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n",
     VERSION_MAJOR,
     VERSION_MINOR,
     VERSION_BUILD,
@@ -306,6 +309,7 @@ GetIDFunc(
     V2,
     V3
   );
+
 
   Status = VoltFile->Write(
     VoltFile,
@@ -316,10 +320,8 @@ GetIDFunc(
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to write VOLTDEV.txt\n");
   }
-
   Status = VoltFile->Close(VoltFile);
-  SetMem(str, bufSize, 0);
-
+  
   gRoot->Open(
     gRoot,
     &SpcFile,
@@ -328,14 +330,16 @@ GetIDFunc(
     0
   );
 
-  for (UINT8 i = 1; i < 9; i++) {
-    bufSize = sizeof(SlotStr);
-    AsciiSPrint(
+  bufSize = sizeof(SlotStr);
+  SetMem(SlotStr, bufSize, 0);
+  for (UINT8 i = 1; i < 9; i++) {  
+    UnicodeSPrint(
       SlotStr,
       bufSize,
-      "Slot%d B\n",
+      L"Slot%d B\n",
       i
     );
+    
 
     Status = SpcFile->Write(
       SpcFile,
