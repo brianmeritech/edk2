@@ -276,14 +276,16 @@ GetIDFunc(
   EFI_FILE_PROTOCOL* VoltFile;
   EFI_FILE_PROTOCOL* SpcFile;
 
-  CHAR16 str[50];
-  CHAR16 SlotStr[10];
+  CHAR16 str[] = L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n";
+  CHAR16 SlotStr[] = L"Slot%d B\n";
+  VA_LIST Marker;
   UINTN bufSize;
   UINT8 V1, V2, V3;
 
   Status = InitFileHandle();
   if (EFI_ERROR(Status)) {
-    Print(L"  Failed to Get File Handle %r \n", Status);
+    Print(L"  Failed to Get File Handle %r\n", Status);
+    return;
   }
 
   gRoot->Open(
@@ -294,10 +296,14 @@ GetIDFunc(
     0
   );
 
-  bufSize = sizeof(str);
-  SetMem(str, bufSize, 0);
-
   Status = GetFWVersion(&V1, &V2, &V3);
+
+  VA_START(Marker, str);
+  bufSize = SPrintLength(str, Marker);
+  VA_END(Marker);
+
+  Print(L"STR Buffer Size %d\n", bufSize);
+  SetMem(str, bufSize, 0);
   UnicodeSPrint(
     str,
     bufSize,
@@ -309,7 +315,6 @@ GetIDFunc(
     V2,
     V3
   );
-
 
   Status = VoltFile->Write(
     VoltFile,
@@ -329,17 +334,19 @@ GetIDFunc(
     EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
     0
   );
-
-  bufSize = sizeof(SlotStr);
+    
+  VA_START(Marker, SlotStr);
+  bufSize = SPrintLength(SlotStr, Marker);
+  VA_END(Marker);
+  Print(L"SlotStr Buffer Size %d\n", bufSize);
   SetMem(SlotStr, bufSize, 0);
-  for (UINT8 i = 1; i < 9; i++) {  
+  for (UINT8 i = 1; i < 9; i++) {    
     UnicodeSPrint(
       SlotStr,
       bufSize,
       L"Slot%d B\n",
       i
-    );
-    
+    );    
 
     Status = SpcFile->Write(
       SpcFile,

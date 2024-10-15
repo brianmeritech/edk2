@@ -26,6 +26,8 @@
 #define DT5_INDX                        6
 #define ETX_INDX                        7
 
+#define MAX_LED_NUMBER                  8
+
 // --- Command Definition
 #define CMD_CHECK_CONNECTION			      0x41
 #define CMD_PORT80_DATA						      0x42
@@ -178,11 +180,25 @@ GetFanRPM(
 
 EFI_STATUS
 SetLEDStatus(
-  CHAR16* LedSta
+  CHAR16* LedStatus
 )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
+  UINT8 LedTyp[MAX_LED_NUMBER];
 
+  for (UINT8 i = 0; i < MAX_LED_NUMBER; i++) {
+    switch (CharToUpper(LedStatus[i])) {
+    case 0x0042:  //B
+      LedTyp[i] = 0;
+      break;
+    case 0x0050:  //P
+      LedTyp[i] = 1;
+      break;
+    case 0x0046:    //F
+      LedTyp[i] = 2;
+      break;
+    }
+  }
 
 
   return Status;
