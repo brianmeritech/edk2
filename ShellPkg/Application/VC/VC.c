@@ -5,7 +5,6 @@
   Copyright (c) 1996 - 2024, Meritech Corporation. All rights reserved.<BR>
   
 **/
-
 #include "VC.h"
 #include "MF.h"
 
@@ -73,7 +72,7 @@ ShellAppMain (
 {
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   UINTN  Index;
-  CHAR16 OpCmd[SIZE_ARGUMENT_MAX] = { 0, };
+  CHAR16 OpCmd[SIZE_ARGUMENT_MAX];
   CHAR16 Date[12];
   
   UnicodeSPrintAsciiFormat(
@@ -95,6 +94,7 @@ ShellAppMain (
         Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
   }
 
+  SetMem16(OpCmd, SIZE_ARGUMENT_MAX, 0)
   ToUpperCase(Argv[1], OpCmd);
 
   ///* change to BIOS ? TBD  
