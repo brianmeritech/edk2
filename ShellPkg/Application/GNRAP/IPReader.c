@@ -189,7 +189,8 @@ ReadIPInfo(
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
   EFI_FILE_PROTOCOL* IpFile;
-  UINT8 IPAddr[4];
+  IPv4_ADDRESS IPAddr;
+
   CHAR16 BDIpStr[] = L"BOARD IP:%d.%d.%d.%d\n";
   CHAR16 TpcIpStr[] = L"TPC IP:%d.%d.%d.250\n";
   CHAR16 TcpPortStr[] = L"TPC PORT : 30001\n";    
@@ -212,7 +213,7 @@ ReadIPInfo(
     0
   );
 
-  Status = GetIPAddr(IPAddr);
+  Status = GetIPAddr(&IPAddr);
   if (EFI_ERROR(Status)) return Status;
 
   // Board IP String
@@ -224,7 +225,7 @@ ReadIPInfo(
     BDIpStr,
     bufSize,
     L"BOARD IP:%d.%d.%d.%d\n",
-    IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3]
+    IPAddr.Addr[0], IPAddr.Addr[1], IPAddr.Addr[2], IPAddr.Addr[3]
   );
 
   Print(L"%s", BDIpStr);
@@ -243,7 +244,7 @@ ReadIPInfo(
     TpcIpStr,
     bufSize,
     L"TPC IP:%d.%d.%d.250\n",
-    IPAddr[0], IPAddr[1], IPAddr[2]
+    IPAddr.Addr[0], IPAddr.Addr[1], IPAddr.Addr[2]
   );
 
   Print(L"%s", TpcIpStr);
@@ -271,7 +272,7 @@ ReadIPInfo(
     TmpIpStr,
     bufSize,
     L"TEMP IP:%d.%d.%d.%d\n",
-    IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3]+5
+    IPAddr.Addr[0], IPAddr.Addr[1], IPAddr.Addr[2], IPAddr.Addr[3]+5
   );
 
   Print(L"%s", TmpIpStr);
@@ -308,7 +309,7 @@ ReadIPInfo(
     GWayStr,
     bufSize,
     L"GATEWAY:%d.%d.1.1\n",
-    IPAddr[0], IPAddr[1]
+    IPAddr.Addr[0], IPAddr.Addr[1]
   );
 
   Print(L"%s", GWayStr);

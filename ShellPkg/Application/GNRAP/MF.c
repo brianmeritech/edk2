@@ -407,7 +407,7 @@ SetVRVoltage(
 
 EFI_STATUS
 GetIPAddr(
-  UINT8* ipAddr
+  IPv4_ADDRESS* Addr
 )
 {
   EFI_STATUS Status = EFI_NOT_READY;
@@ -421,10 +421,10 @@ GetIPAddr(
 
   if (!EFI_ERROR(ReadUartData())) {
     if (gRxPkt[CMD_INDX] == GET_IP_INFO_DONE) {
-      ipAddr[0] = gRxPkt[DAT2_INDX];
-      ipAddr[1] = gRxPkt[DAT3_INDX];
-      ipAddr[2] = gRxPkt[DAT4_INDX];
-      ipAddr[3] = gRxPkt[DAT5_INDX];
+      Addr->Addr[0] = gRxPkt[DAT2_INDX];
+      Addr->Addr[1] = gRxPkt[DAT3_INDX];
+      Addr->Addr[2] = gRxPkt[DAT4_INDX];
+      Addr->Addr[3] = gRxPkt[DAT5_INDX];
       
       Status = EFI_SUCCESS;
     }

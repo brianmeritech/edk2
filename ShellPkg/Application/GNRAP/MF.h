@@ -66,7 +66,7 @@ SetVRVoltage(
 
 EFI_STATUS
 GetIPAddr(
-  UINT8*
+  IPv4_ADDRESS*
 );
 
 EFI_STATUS
