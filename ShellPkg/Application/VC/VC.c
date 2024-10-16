@@ -231,14 +231,80 @@ ShellAppMain (
     }
    
   }
-  else if (Argc == 4) {
-    
+  else if (Argc == 4) {    
     if (!StrCmp(OpCmd, L"-SV")) { // Set Output Voltage
+      UINTN Channel;
+      UINTN Voltage;
 
+      Channel = StrDecimalToUintn(Argv[2]);
+      Voltage = StrDecimalToUintn(Argv[3]);
+
+      if (Channel >= 1 && Channel <= 4) {
+        if (Voltage < MIN_VDD || Voltage > MAX_VDD) {
+          Print(L"  [ERROR] Set V-OUT invalid VDD voltage : %d (mV)\n", Voltage);
+          return Status;
+        }
+      }
+      else if (Channel == 5) {
+        if (Voltage < MIN_P3_3V || Voltage > MAX_P3_3V) {
+          Print(L"  [ERROR] Set V-OUT invalid P3.3V voltage : %d (mV)\n", Voltage);
+          return Status;
+        }
+      }
+      else {
+        Print(L"  [ERROR] Set V-OUT invalid voltage channel : %d\n", Channel);
+        return Status;
+      }
+
+      Status = SetVRVoltage(
+        0x61,
+        Channel,
+        (UINT16)Voltage
+      );
+
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Set %s voltage : %d (mV) OK\n", StrVolCh[Channel - 1],  Voltage);
+      }
+      else {
+        Print(L"  [ERROR] Set %s voltage : % d(mV)\n", StrVolCh[Channel - 1], Voltage);
+      }
     }
 
     if (!StrCmp(OpCmd, L"-BV")) { // Set Boot Voltage
+      UINTN Channel;
+      UINTN Voltage;
 
+      Channel = StrDecimalToUintn(Argv[2]);
+      Voltage = StrDecimalToUintn(Argv[3]);
+      if (Channel >= 1 && Channel <= 4) {
+        if (Voltage < MIN_VDD || Voltage > MAX_VDD) {
+          Print(L"  [ERROR] Set BOOT-V invalid VDD voltage : %d (mV)\n", Voltage);
+          return Status;
+        }
+      }
+      else if (Channel == 5) {
+        if (Voltage < MIN_P3_3V || Voltage > MAX_P3_3V) {
+          Print(L"  [ERROR] Set BOOT-V invalid P3.3V voltage : %d (mV)\n", Voltage);
+          return Status;
+        }
+      }
+      else {
+        Print(L"  [ERROR] Set BOOT-V invalid voltage channel : %d\n", Channel);
+        return Status;
+      }
+
+      Status = SetVRVoltage(
+        0x63,
+        Channel,
+        (UINT16)Voltage
+      );
+
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Set %s BOOT voltage : %d (mV) OK\n", StrVolCh[Channel - 1], Voltage);
+      }
+      else {
+        Print(L"  [ERROR] Set %s BOOT voltage : % d(mV)\n", StrVolCh[Channel - 1], Voltage);
+      }
     }
 
     if (!StrCmp(OpCmd, L"-FS")) { // Set Fan Speed

@@ -61,7 +61,7 @@ EFI_STATUS
 SetVRVoltage(
   UINT8,
   UINTN,
-  UINT16*
+  UINT16
   );
 
 

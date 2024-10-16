@@ -366,13 +366,25 @@ EFI_STATUS
 SetVRVoltage(
   UINT8 bCmd,
   UINTN Channel,
-  UINT16* Vol
+  UINT16 Vol
   )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
 
+  InitTxPkt();
+  InitRxPkt();
+  gTxPkt[CMD_INDX] = bCmd;
+  gTxPkt[DAT1_INDX] = (UINT8)Channel;
+  gTxPkt[DAT2_INDX] = (UINT8)(Vol & 0x00FF);
+  gTxPkt[DAT3_INDX] = (UINT8)((Vol & 0xFF00) >> 8);
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
-
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == bCmd + 0x40) {
+      
+      Status = EFI_SUCCESS;
+    }
+  }
 
   return Status;
 }
