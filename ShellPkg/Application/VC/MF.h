@@ -40,4 +40,10 @@ SetFanSpeed(
   UINTN
 );
 
+EFI_STATUS
+GetSlotCount(
+  UINTN,
+  UINT32*
+);
+
 #endif

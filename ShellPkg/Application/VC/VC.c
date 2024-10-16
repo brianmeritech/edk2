@@ -19,6 +19,8 @@
 #define MAX_TRY_CNT							        5			// Maximum retry count for All command
 #define	SIZE_ARGUMENT_MAX				        16		// Maximum command string count
 
+#define MAX_SLOT_VALUE                  8     // MRDIMM Slot Number 
+
 //--- Define VDD, VPP MIN/MAX voltages
 #define	MIN_VDD								          4250	// Min. VDD volt = 4.25V
 #define	MAX_VDD								          15000	// Max. VDD volt = 15.00V
@@ -94,7 +96,7 @@ ShellAppMain (
         Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
   }
 
-  SetMem16(OpCmd, SIZE_ARGUMENT_MAX, 0)
+  SetMem16(OpCmd, SIZE_ARGUMENT_MAX, 0);
   ToUpperCase(Argv[1], OpCmd);
 
   ///* change to BIOS ? TBD  
@@ -152,7 +154,28 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-GC")) { // Get Memory Slot Count
+      UINT32 Count;
+      UINTN Slot;
+      UINT8 Masked = 0x00;
+      Slot = StrDecimalToUintn(Argv[2]);
 
+      if (Slot > 8) {
+        Print(L"  [ERROR] Invalid socket number : %d\n", Slot);
+      }
+
+      if (Slot != 0) Masked |= ~(0x1 << (((UINT8)Slot) - 1));
+      
+      for (UINT8 i = 1; i <= MAX_SLOT_VALUE; i++) {
+        if (!(Masked & (0x01<<(i-1)))) {
+          Status = GetSlotCount(
+            Slot,
+            &Count
+          );
+          if (!EFI_ERROR(Status)) {
+            Print(L"  Get Memory Socket %d Count : %d OK\n", Slot, Count);
+          }
+        }
+      }
     }
 
     if (!StrCmp(OpCmd, L"-SC")) { // Set Memory Slot Count Action
@@ -304,7 +327,7 @@ GetIDFunc(
   EFI_FILE_PROTOCOL* VoltFile;
   EFI_FILE_PROTOCOL* SpcFile;
 
-  CHAR16 str[] = L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n";
+  CHAR16 VerStr[] = L"VC S/W VERSION=%d.%d.%d\nVC F/W VERSION=%d.%d.%d\n";
   CHAR16 SlotStr[] = L"Slot%d B\n";
   VA_LIST Marker;
   UINTN bufSize;
@@ -326,14 +349,13 @@ GetIDFunc(
 
   Status = GetFWVersion(&V1, &V2, &V3);
 
-  VA_START(Marker, str);
+  VA_START(Marker, VerStr);
   bufSize = SPrintLength(str, Marker);
   VA_END(Marker);
 
-  Print(L"STR Buffer Size %d\n", bufSize);
-  SetMem(str, bufSize, 0);
+  Print(L"STR Buffer Size %d\n", bufSize);  
   UnicodeSPrint(
-    str,
+    VerStr,
     bufSize,
     L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n",
     VERSION_MAJOR,
@@ -347,7 +369,7 @@ GetIDFunc(
   Status = VoltFile->Write(
     VoltFile,
     &bufSize,
-    str
+    VerStr
   );
 
   if (EFI_ERROR(Status)) {
@@ -362,12 +384,13 @@ GetIDFunc(
     EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
     0
   );
-    
+
+  SetLEDStatus(L"BBBBBBBB");    
   VA_START(Marker, SlotStr);
   bufSize = SPrintLength(SlotStr, Marker);
   VA_END(Marker);
   Print(L"SlotStr Buffer Size %d\n", bufSize);
-  SetMem(SlotStr, bufSize, 0);
+  
   for (UINT8 i = 1; i < 9; i++) {    
     UnicodeSPrint(
       SlotStr,
@@ -388,7 +411,6 @@ GetIDFunc(
   }
 
   Status = SpcFile->Close(SpcFile);
-
   Print(L"  Set CPX_VC -SL BBBBBBBB and Create VOLTDEV.TXT & SPCLED.TXT Ok!\n\n");
 
 }

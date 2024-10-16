@@ -49,6 +49,7 @@
 
 #define CHECK_CONNECTION_DONE           0x81
 #define GET_FW_VERSION_DONE             0x91
+#define GET_SLOT_COUNT_DONE             0x95
 #define GET_FAN_RPM_DONE                0x96
 #define SET_LED_STATUS_DONE             0xA4
 #define SET_FAN_PWM_DOEN                0xA8
@@ -59,7 +60,7 @@ UINT8 gRxPkt[SIZE_CMD_PACKET];
 EFI_STATUS
 ReadUartData(
   void
-)
+  )
 {
   for (UINT8 i = 0; i < RETRY; i++) {
     if (SerialPortPoll()) {
@@ -76,7 +77,7 @@ ReadUartData(
 void
 InitTxPkt(
   void
-)
+  )
 {
   SetMem(gTxPkt, SIZE_CMD_PACKET, 0);
   gTxPkt[STX_INDX] = STX;
@@ -86,7 +87,7 @@ InitTxPkt(
 void
 InitRxPkt(
   void
-)
+  )
 {
   SetMem(gRxPkt, SIZE_CMD_PACKET, 0);
 }
@@ -94,7 +95,7 @@ InitRxPkt(
 EFI_STATUS
 InitSerialPort(
   void
-)
+  )
 {
   return SerialPortInitialize();
 }
@@ -102,7 +103,7 @@ InitSerialPort(
 EFI_STATUS
 CheckConnect(
   void
-)
+  )
 {
   InitTxPkt();
   InitRxPkt();
@@ -120,7 +121,7 @@ CheckConnect(
 void
 SetP80(
   UINTN Dat
-)
+  )
 {
   InitTxPkt();
   gTxPkt[CMD_INDX] = CMD_PORT80_DATA;
@@ -135,7 +136,7 @@ GetFWVersion(
   UINT8* pV1,
   UINT8* pV2,
   UINT8* pV3
-)
+  ) 
 {
   InitTxPkt();
   InitRxPkt();
@@ -158,7 +159,7 @@ GetFWVersion(
 UINT16
 GetFanRPM(
   UINTN FAN
-)
+  )
 {
   UINT16 tRPM = 0;
 
@@ -182,7 +183,7 @@ GetFanRPM(
 EFI_STATUS
 SetLEDStatus(
   CHAR16* LedStatus
-)
+  )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
   UINT8 LedTyp[MAX_LED_NUMBER];
@@ -228,7 +229,7 @@ EFI_STATUS
 SetFanSpeed(
   UINTN Channel,
   UINTN Speed
-)
+  )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
 
@@ -253,6 +254,31 @@ SetFanSpeed(
     if (gRxPkt[CMD_INDX] == SET_FAN_PWM_DOEN) {
       return EFI_SUCCESS;
     }    
+  }
+
+  return Status;
+}
+
+
+EFI_STATUS
+GetSlotCount(
+  UINTN Slot,
+  UINT32* pCount
+  )
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  InitTxPkt();
+  InitRxPkt();
+  gTxPkt[CMD_INDX] = CMD_GET_MEM_COUNT;
+  gTxPkt[DAT1_INDX] = (UINT8)Slot;
+
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == GET_SLOT_COUNT_DONE) {
+      *pCount = gRxPkt[DAT2_INDX] | (gRxPkt[DAT3_INDX] << 8) | (gRxPkt[DAT4_INDX] << 16) | (gRxPkt[DAT5_INDX] << 24);
+      return EFI_SUCCESS;
+    }
   }
 
   return Status;
