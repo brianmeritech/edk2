@@ -22,6 +22,8 @@
 #define MAX_SLOT_VALUE                  8     // MRDIMM Slot Number 
 
 //--- Define VDD, VPP MIN/MAX voltages
+CHAR16* StrVolCh[5] = { L"P12V-CD", L"P12V-EF", L"P12V-IJ", L"P12V-KL", L"P3.3V" };
+
 #define	MIN_VDD								          4250	// Min. VDD volt = 4.25V
 #define	MAX_VDD								          15000	// Max. VDD volt = 15.00V
 #define MIN_P3_3V							          3000	// Min. P3.3 volt = 3.0V
@@ -146,7 +148,21 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-GV")) { // Get Output voltage
+      UINTN Channel;
+      UINT16 Vol;
+      Channel = StrDecimalToUintn(Argv[2]);
+      if (Channel == 0 || Channel > 5) {
+        Print(L"  [ERROR] Get V-OUT Channel number\n");
+        return EFI_UNSUPPORTED;
+      }
 
+      Status = GetOutVoltage(Channel, &Vol);
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Get %s voltage: %d (mV)\n", StrVolCh[Channel - 1], Vol);
+      }
+      else {
+        Print(L"  [ERROR] Get %s voltage Error\n", StrVolCh[Channel - 1]);
+      }
     }
 
     if (!StrCmp(OpCmd, L"-GB")) { // Get Boot voltage

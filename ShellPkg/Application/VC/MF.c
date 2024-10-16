@@ -334,5 +334,17 @@ SetSlotCountAct(
   }
 
   return Status;
+}
 
+EFI_STATUS
+GetOutVoltage(
+  UINTN Channel,
+  UINT16* Vol
+  )
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+
+
+  return Status;
 }

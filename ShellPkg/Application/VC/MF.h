@@ -50,4 +50,11 @@ SetSlotCountAct(
   CHAR16*
   );
 
+
+EFI_STATUS
+GetOutVoltage(
+  UINTN,
+  UINT16*
+  );
+
 #endif
