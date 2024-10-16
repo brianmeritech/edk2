@@ -5,9 +5,7 @@
   Copyright (c) 1996 - 2024, Meritech Corporation. All rights reserved.<BR>
 
 **/
-
-
-#include <Library\SerialPortLib.h>
+#include <Library/SerialPortLib.h>
 #include "VC.h"
 
 #define RETRY                           5

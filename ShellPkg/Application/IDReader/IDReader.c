@@ -6,20 +6,42 @@
  
 
 **/
-
-
-
 #include "IDReader.h"
 
-/*Function Declaration*/
+/*******************************************************************************
+ *	Date		  Version		Comment
+ *	24/10/11	V0.1.0		Initial Version
+ ******************************************************************************/
+#define VERSION_MAJOR						0
+#define VERSION_MINOR						1
+#define VERSION_BUILD					  0
 
-void PrintHelpMsg(
+#define MAX_TRY_CNT							5
+
+#define SIZE_CMD_ARGS						16
+#define SIZE_CMD_PACKET					8
+#define SIZE_MAX_ID_SN					16
+#define STX								    	0x02
+#define ETX									    0x03
+
+#define CMD_CHECK_CONNECTION		0x41
+#define CMD_GET_BOARD_ID				0x72
+#define CMD_SET_BOARD_ID				0x73
+#define CMD_GET_BOARD_SN				0x74
+#define CMD_SET_BOARD_SN				0x75
+
+#define BOARD_SN							  1
+#define BOARD_ID							  2
+
+ /*Function declaration*/
+void
+PrintHelpMsg(
   void
 );
 
 void ToUpperCase(
-  CHAR16* src,
-  CHAR16* dest
+  CHAR16*,
+  CHAR16*
 );
 
 /**
@@ -44,13 +66,18 @@ ShellAppMain (
   )
 {
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
-  UINTN  Index;
   CHAR16 OpCmd1[SIZE_CMD_ARGS] = { 0, };
   CHAR16 OpCmd2[SIZE_CMD_ARGS] = { 0, };
+  CHAR16 Date[12];
 
+  UnicodeSPrintAsciiFormat(
+    &Date[0],
+    sizeof(Date),
+    __DATE__
+  );
 
   Print(L"IDReader for PCT3.0 GNRAP MRDIMM V%d.%d.%d %s\n",
-      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, __DATE__);
+      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, Date);
 
   if (Argc == 1 || Argc > 4) {
     PrintHelpMsg();
@@ -58,11 +85,7 @@ ShellAppMain (
   }
 
   ToUpperCase(Argv[1], OpCmd1);
-
-  for (Index = 1; Index < Argc; Index++) {
-    Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
-  }
-
+  
   if (!StrCmp(OpCmd1, L"-CC")) {          // Check Connection
     //TBD
 
@@ -100,8 +123,6 @@ ShellAppMain (
       }
     }
   }
-
-
 
   if (EFI_ERROR(Status)) {
     Print(L"  [ERROR] %s %s are not valid command.\n", OpCmd1, OpCmd2);    

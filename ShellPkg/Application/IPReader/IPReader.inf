@@ -39,7 +39,9 @@
   UefiLib
   ShellLib
   ShellCEntryLib
-
+  PrintLib
+  BaseMemoryLib
+  SerialPortLib
 
 [Guids]
 

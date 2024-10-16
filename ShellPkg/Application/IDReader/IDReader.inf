@@ -41,14 +41,16 @@
   ShellCEntryLib
   BaseLib
   IoLib
-
+  PrintLib
+  BaseMemoryLib
+  SerialPortLib
 
 [Guids]
 
 [Ppis]
 
 [Protocols]
-  gEfiSerialIoProtocolGuid
+
 
 [FeaturePcd]
 
