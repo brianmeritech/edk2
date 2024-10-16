@@ -23,6 +23,8 @@
 EFI_FILE_PROTOCOL* gRoot = NULL;
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
 
+CHAR16 Date[12];
+
  /*Function declaration*/
 void
 PrintHelpMsg(
@@ -67,9 +69,8 @@ ShellAppMain (
 {
   EFI_STATUS  Status = EFI_UNSUPPORTED;
   CHAR16 OpCmd[MAX_ARGUMENT_STRING] = { 0, };
-  CHAR16 Date[12];
-
-  UnicodeSPrintAsciiFormat(
+  
+    UnicodeSPrintAsciiFormat(
     &Date[0],
     sizeof(Date),
     __DATE__
@@ -173,7 +174,17 @@ ReadIPInfo(
   EFI_STATUS Status = EFI_UNSUPPORTED;
   EFI_FILE_PROTOCOL* IpFile;
   UINT8 IPAddr[4];
-
+  CHAR16 BDIpStr[] = L"BOARD IP:%d.%d.%d.%d\n";
+  CHAR16 TpcIpStr[] = L"TPC IP:%d.%d.%d.250\n";
+  CHAR16 TcpPortStr[] = L"TPC PORT : 30001\n";    
+  CHAR16 TmpIpStr[] = L"TEMP IP:%d.%d.%d.%d\n";
+  CHAR16 TmpPortStr[] = L"TEMP PORT:30002\n";
+  CHAR16 MaskStr[] = L"NETMASK:255.255.0.0\n";
+  CHAR16 GWayStr[] = L"GATEWAY:%d.%d.1.1\n";
+  CHAR16 VerStr[] = L"Version:%d.%d.%d[%d.%02d.%02d]\n";
+  VA_LIST Marker;
+  UINTN bufSize;
+  
   Status = InitFileHandle();
   if (EFI_ERROR(Status)) return Status;
 
@@ -188,15 +199,126 @@ ReadIPInfo(
   Status = GetIPAddr(IPAddr);
   if (EFI_ERROR(Status)) return Status;
 
-  Print(L"  BOARD IP:%d.%d.%d.%d\n", IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3]);
-  Print(L"  TPC IP:%d.%d.%d.250\n", IPAddr[0], IPAddr[1], IPAddr[2]);
-  Print(L"  TPC PORT:30001\n");
-  Print(L"  TEMP IP:%d.%d.%d.%d\n", IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3] + 5);
-  Print(L"  TEMP PORT:30002\n");
-  Print(L"  NETMASK:255.255.0.0\n");
-  Print(L"  GATEWAY:%d.%d.1.1\n", IPAddr[0], IPAddr[1]);
+  // Board IP String
+  VA_START(Marker, BDIpStr);
+  bufSize = SPrintLength(BDIpStr, Marker);
+  VA_END(Marker);
 
+  UnicodeSPrint(
+    BDIpStr,
+    bufSize,
+    L"BOARD IP:%d.%d.%d.%d\n",
+    IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3]
+  );
 
+  Print(L"%s", BDIpStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    BDIpStr
+  );
+
+  // TCP IP String
+  VA_START(Marker, TpcIpStr);
+  bufSize = SPrintLength(TpcIpStr, Marker);
+  VA_END(Marker);
+
+  UnicodeSPrint(
+    TpcIpStr,
+    bufSize,
+    L"TPC IP:%d.%d.%d.250\n",
+    IPAddr[0], IPAddr[1], IPAddr[2]
+  );
+
+  Print(L"%s", TpcIpStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    TpcIpStr
+  );
+
+  // TCP Port String
+  Print(L"%s", TcpPortStr);
+  bufSize = sizeof(TcpPortStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    TcpPortStr
+  );
+
+  // TEMP IP String
+  VA_START(Marker, TmpIpStr);
+  bufSize = SPrintLength(TmpIpStr, Marker);
+  VA_END(Marker);
+
+  UnicodeSPrint(
+    TmpIpStr,
+    bufSize,
+    L"TEMP IP:%d.%d.%d.%d\n",
+    IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3]+5
+  );
+
+  Print(L"%s", TmpIpStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    TmpIpStr
+  );
+
+  // TEMP Port String
+  Print(L"%s", TmpPortStr);
+  bufSize = sizeof(TmpPortStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    TmpPortStr
+  );
+
+  // NET Mask String
+  Print(L"%s", MaskStr);
+  bufSize = sizeof(MaskStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    MaskStr
+  );
+
+  // Get Way String
+  VA_START(Marker, GWayStr);
+  bufSize = SPrintLength(GWayStr, Marker);
+  VA_END(Marker);
+
+  UnicodeSPrint(
+    GWayStr,
+    bufSize,
+    L"GATEWAY:%d.%d.1.1\n",
+    IPAddr[0], IPAddr[1]
+  );
+
+  Print(L"%s", GWayStr);
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    GWayStr
+  );
+
+  // Version String
+  VA_START(Marker, VerStr);
+  bufSize = SPrintLength(VerStr, Marker);
+  VA_END(Marker);
+
+  UnicodeSPrint(
+    VerStr,
+    bufSize,
+    L"Version:%d.%d.%d[%s]\n",
+    VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD,Date
+  );
+
+  Status = IpFile->Write(
+    IpFile,
+    &bufSize,
+    VerStr
+  );
 
   return Status;
 }
