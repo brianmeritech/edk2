@@ -28,7 +28,9 @@
 
 #define MAX_LED_NUMBER                  8
 #define MAX_LED_TABLE                   2
+
 #define MAX_SLOT_NUMBER                 8
+#define MAX_SLOT_TABLE                  2
 
 // --- Command Definition
 #define CMD_CHECK_CONNECTION			      0x41
@@ -215,10 +217,12 @@ SetLEDStatus(
 
     if (!EFI_ERROR(ReadUartData())) {
       if (gRxPkt[CMD_INDX] == SET_LED_STATUS_DONE) {
-        gBS->Stall(150);        
+        gBS->Stall(150);
+        Status = EFI_SUCCESS;
       }
       else {
         Print(L"  [ERROR] Set LED Communication ERROR(%d)\n", i);
+        Status = EFI_UNSUPPORTED;
       }
     }
   }
@@ -253,7 +257,7 @@ SetFanSpeed(
   
   if (!EFI_ERROR(ReadUartData())) {
     if (gRxPkt[CMD_INDX] == SET_FAN_PWM_DOEN) {
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
     }    
   }
 
@@ -278,7 +282,7 @@ GetSlotCount(
   if (!EFI_ERROR(ReadUartData())) {
     if (gRxPkt[CMD_INDX] == GET_SLOT_COUNT_DONE) {
       *pCount = gRxPkt[DAT2_INDX] | (gRxPkt[DAT3_INDX] << 8) | (gRxPkt[DAT4_INDX] << 16) | (gRxPkt[DAT5_INDX] << 24);
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
     }
   }
 
@@ -305,6 +309,28 @@ SetSlotCountAct(
       ActTyp[i] = 2;
       break;
     }
+  }
+
+  for (UINT8 i = 0; i < MAX_SLOT_TABLE; i++) {
+    InitTxPkt();
+    gTxPkt[CMD_INDX] = CMD_SET_MEM_COUNT_ACTION;
+    gTxPkt[DAT1_INDX] = i;                     // 0: SLOT1~4 ; 1: SLOT5~8
+    gTxPkt[DAT2_INDX] = ActTyp[i * 4];
+    gTxPkt[DAT3_INDX] = ActTyp[i * 4 + 1];
+    gTxPkt[DAT4_INDX] = ActTyp[i * 4 + 2];
+    gTxPkt[DAT5_INDX] = ActTyp[i * 4 + 3];
+    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == CMD_SET_MEM_COUNT_ACTION) {
+        gBS->Stall(150);
+        Status = EFI_SUCCESS;
+      }
+      else {
+        Print(L"  [ERROR] Memory Slot Action Communication ERROR : %d\n", i);
+        Status = EFI_UNSUPPORTED;
+      }
+    }    
   }
 
   return Status;
