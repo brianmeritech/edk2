@@ -29,6 +29,8 @@
 [Sources]
   IDReader.c
   IDReader.h
+  MF.c
+  MF.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -50,7 +52,7 @@
 [Ppis]
 
 [Protocols]
-
+  gEfiSimpleFileSystemProtocolGuid 
 
 [FeaturePcd]
 

@@ -64,5 +64,9 @@ SetVRVoltage(
   UINT16
   );
 
+EFI_STATUS
+GetIPAddr(
+  UINT8*
+  );
 
 #endif

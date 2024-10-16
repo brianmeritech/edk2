@@ -19,6 +19,10 @@
 
 #define MAX_ARGUMENT_STRING			16
 #define SIZE_CMD_ARGS						16
+
+EFI_FILE_PROTOCOL* gRoot = NULL;
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
+
  /*Function declaration*/
 void
 PrintHelpMsg(
@@ -28,6 +32,16 @@ PrintHelpMsg(
 void ToUpperCase(
   CHAR16*,
   CHAR16*
+);
+
+EFI_STATUS
+InitFileHandle(
+  void
+);
+
+EFI_STATUS
+ReadIPInfo(
+  void
 );
 
 /**
@@ -70,10 +84,19 @@ ShellAppMain (
     VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, Date);
 
   ToUpperCase(Argv[1], OpCmd);
+
+  Status = InitSerialPort();
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to configure Serial Port %r \n", Status);
+  }
     
   if (Argc == 2) {
     if (!StrCmp(OpCmd, L"-R")) {      //Read IP Info
-      //TBD 
+      Status = ReadIPInfo();
+
+      if (!EFI_ERROR(Status)) {
+        Print(L"  ReadIp.TXT file create Ok!\n\n");
+      }
     }
   }
   else {
@@ -109,4 +132,71 @@ void ToUpperCase(CHAR16* src, CHAR16* dest)
     src++;
     dest++;
   }
+}
+
+EFI_STATUS
+InitFileHandle(
+  void
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  Status = gBS->LocateProtocol(
+    &gEfiSimpleFileSystemProtocolGuid,
+    NULL,
+    (VOID**)&gSimpleFileSystem
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open File System\n");
+    return Status;
+  }
+
+  Status = gSimpleFileSystem->OpenVolume(
+    gSimpleFileSystem,
+    &gRoot
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open Root\n");
+    return Status;
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+ReadIPInfo(
+  void
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+  EFI_FILE_PROTOCOL* IpFile;
+  UINT8 IPAddr[4];
+
+  Status = InitFileHandle();
+  if (EFI_ERROR(Status)) return Status;
+
+  gRoot->Open(
+    gRoot,
+    &IpFile,
+    L"ReadIp.TXT",
+    EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+    0
+  );
+
+  Status = GetIPAddr(IPAddr);
+  if (EFI_ERROR(Status)) return Status;
+
+  Print(L"  BOARD IP:%d.%d.%d.%d\n", IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3]);
+  Print(L"  TPC IP:%d.%d.%d.250\n", IPAddr[0], IPAddr[1], IPAddr[2]);
+  Print(L"  TPC PORT:30001\n");
+  Print(L"  TEMP IP:%d.%d.%d.%d\n", IPAddr[0], IPAddr[1], IPAddr[2], IPAddr[3] + 5);
+  Print(L"  TEMP PORT:30002\n");
+  Print(L"  NETMASK:255.255.0.0\n");
+  Print(L"  GATEWAY:%d.%d.1.1\n", IPAddr[0], IPAddr[1]);
+
+
+
+  return Status;
 }

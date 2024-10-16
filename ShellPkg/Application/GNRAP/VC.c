@@ -94,9 +94,13 @@ ShellAppMain (
   }
 
   SetMem16(OpCmd, SIZE_ARGUMENT_MAX, 0);
+
   ToUpperCase(Argv[1], OpCmd);
 
-  ///* change to BIOS ? TBD  
+  Status = InitSerialPort();
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to configure Serial Port %r \n", Status);
+  }
   Status = InitSerialPort();
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to configure Serial Port %r \n", Status);

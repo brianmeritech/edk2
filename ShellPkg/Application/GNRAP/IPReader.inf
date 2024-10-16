@@ -29,6 +29,8 @@
 [Sources]
   IPReader.c
   IPReader.h
+  MF.c
+  MF.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,7 +50,7 @@
 [Ppis]
 
 [Protocols]
-  gEfiSerialIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
 
 [FeaturePcd]
 

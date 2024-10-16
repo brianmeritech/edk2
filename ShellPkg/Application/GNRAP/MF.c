@@ -56,9 +56,10 @@
 #define SET_LED_STATUS_DONE             0xA4
 #define SET_FAN_PWM_DOEN                0xA8
 
-#define CMD_CHECK_CONNECTION				    0x41
 #define CMD_GET_IP_INFO						      0x71
 #define CMD_SET_IP_INFO						      0x78
+
+#define GET_IP_INFO_DONE                0xB1
 
 #define TYPE_IP_ADDRESS						      1
 #define TYPE_SUBNET_MASK					      2
@@ -395,6 +396,34 @@ SetVRVoltage(
 
   if (!EFI_ERROR(ReadUartData())) {
     if (gRxPkt[CMD_INDX] == bCmd + 0x40) {
+      
+      Status = EFI_SUCCESS;
+    }
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+GetIPAddr(
+  UINT8* ipAddr
+)
+{
+  EFI_STATUS Status = EFI_NOT_READY;
+
+  InitTxPkt();
+  InitRxPkt();
+
+  gTxPkt[CMD_INDX] = CMD_GET_IP_INFO;
+  gTxPkt[DAT1_INDX] = TYPE_IP_ADDRESS;
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == GET_IP_INFO_DONE) {
+      ipAddr[0] = gRxPkt[DAT2_INDX];
+      ipAddr[1] = gRxPkt[DAT3_INDX];
+      ipAddr[2] = gRxPkt[DAT4_INDX];
+      ipAddr[3] = gRxPkt[DAT5_INDX];
       
       Status = EFI_SUCCESS;
     }
