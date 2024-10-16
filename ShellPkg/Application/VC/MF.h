@@ -50,12 +50,19 @@ SetSlotCountAct(
   CHAR16*
   );
 
-
 EFI_STATUS
 GetVRVoltage(
   UINT8,
   UINTN,
   UINT16*
   );
+
+EFI_STATUS
+SetVRVoltage(
+  UINT8,
+  UINTN,
+  UINT16*
+  );
+
 
 #endif

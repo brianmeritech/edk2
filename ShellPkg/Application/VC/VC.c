@@ -22,12 +22,13 @@
 #define MAX_SLOT_VALUE                  8     // MRDIMM Slot Number 
 
 //--- Define VDD, VPP MIN/MAX voltages
-CHAR16* StrVolCh[5] = { L"P12V-CD", L"P12V-EF", L"P12V-IJ", L"P12V-KL", L"P3.3V" };
-
 #define	MIN_VDD								          4250	// Min. VDD volt = 4.25V
 #define	MAX_VDD								          15000	// Max. VDD volt = 15.00V
 #define MIN_P3_3V							          3000	// Min. P3.3 volt = 3.0V
 #define MAX_P3_3V							          3600	// Max. P3.3 volt = 3.6V
+
+
+CHAR16* StrVolCh[5] = { L"P12V-CD", L"P12V-EF", L"P12V-IJ", L"P12V-KL", L"P3.3V" };
 
 EFI_FILE_PROTOCOL* gRoot = NULL;
 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
@@ -75,7 +76,6 @@ ShellAppMain (
   )
 {
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
-  UINTN  Index;
   CHAR16 OpCmd[SIZE_ARGUMENT_MAX];
   CHAR16 Date[12];
   
@@ -93,11 +93,6 @@ ShellAppMain (
     return Status;
   }
 
-  // Test for shell UI debug use
-  for (Index = 1; Index < Argc; Index++) {
-        Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
-  }
-
   SetMem16(OpCmd, SIZE_ARGUMENT_MAX, 0);
   ToUpperCase(Argv[1], OpCmd);
 
@@ -111,7 +106,7 @@ ShellAppMain (
     if (!StrCmp(OpCmd, L"-H")) {
         PrintHelpMsg();
     }
-    else if (!StrCmp(OpCmd, L"-CC")) {  //Check Connect
+    else if (!StrCmp(OpCmd, L"-CC")) {  // Check Connection
       Status = CheckConnect();
       if (!EFI_ERROR(Status)) {
         Print(L"  Connection Ok!\n");
@@ -120,7 +115,7 @@ ShellAppMain (
         Print(L"  Connection Error!\n");
       }
     }
-    else if (!StrCmp(OpCmd, L"-GR")) {  //Get Firwmare Version
+    else if (!StrCmp(OpCmd, L"-GR")) {  // Get Firwmare Version
       UINT8 V1, V2, V3;
       Status = GetFWVersion(&V1, &V2, &V3);
       if (!EFI_ERROR(Status)) {
@@ -156,7 +151,7 @@ ShellAppMain (
         return EFI_UNSUPPORTED;
       }
 
-      Status = GetVRVoltage(0x52, Channel, &Vol);     // Get Current Voltage cmd 0x52
+      Status = GetVRVoltage(0x52, Channel, &Vol);
       if (!EFI_ERROR(Status)) {
         Print(L"  Get %s voltage: %d (mV)\n", StrVolCh[Channel - 1], Vol);
       }
@@ -174,7 +169,7 @@ ShellAppMain (
         return EFI_UNSUPPORTED;
       }
 
-      Status = GetVRVoltage(0x54, Channel, &Vol);     // Get Boot Voltage cmd 0x54
+      Status = GetVRVoltage(0x54, Channel, &Vol);
       if (!EFI_ERROR(Status)) {
         Print(L"  Get %s BOOT voltage: %d (mV)\n", StrVolCh[Channel - 1], Vol);
       }

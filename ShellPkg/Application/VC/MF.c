@@ -52,7 +52,7 @@
 
 #define CHECK_CONNECTION_DONE           0x81
 #define GET_FW_VERSION_DONE             0x91
-#define GET_CUR_VOLTAGE_DONE         0x92
+#define GET_CUR_VOLTAGE_DONE            0x92
 #define GET_SLOT_COUNT_DONE             0x95
 #define GET_FAN_RPM_DONE                0x96
 #define SET_LED_STATUS_DONE             0xA4
@@ -339,25 +339,40 @@ SetSlotCountAct(
 
 EFI_STATUS
 GetVRVoltage(
-  UINT8 Type,
+  UINT8 bCmd,
+  UINTN Channel,
+  UINT16* Vol
+  )
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+  
+  InitTxPkt();
+  InitRxPkt();
+  gTxPkt[CMD_INDX] = bCmd;
+  gTxPkt[DAT1_INDX] = (UINT8)Channel;
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == bCmd+0x40) {
+      *Vol = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
+      Status = EFI_SUCCESS;
+    }
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+SetVRVoltage(
+  UINT8 bCmd,
   UINTN Channel,
   UINT16* Vol
   )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
 
-  InitTxPkt();
-  InitRxPkt();
-  gTxPkt[CMD_INDX] = Type;
-  gTxPkt[DAT1_INDX] = (UINT8)Channel;
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == Type+0x40) {
-      *Vol = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
-      Status = EFI_SUCCESS;
-    }
-  }
+
 
   return Status;
 }
