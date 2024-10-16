@@ -38,11 +38,22 @@
 **/
 INTN
 EFIAPI
-ShellAppMain (
+ShellAppMain(
   IN UINTN   Argc,
-  IN CHAR16  **Argv
-  )
+  IN CHAR16** Argv
+)
 {
+  EFI_STATUS Status;
+  IPv4_ADDRESS Addr;
+  Status = StrToIpv4Address(
+    Argv[1], NULL, &Addr, NULL
+  );
+
+  Print(L"IP Address %d.%d.%d.%d\n", Addr.Addr[0], Addr.Addr[1], Addr.Addr[2], Addr.Addr[3]);
+
+  return Status;
+}
+/*
   CHAR16 str[] = L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n";
   CHAR16 SlotStr[] = L"Slot%d B\n";
   VA_LIST Marker;
@@ -72,7 +83,7 @@ ShellAppMain (
   VA_END(Marker);
 
   Print(L"SlotStr Buffer Size %d\n", bufSize);
-
+  
   for (UINT8 i = 1; i < 9; i++) {
     UnicodeSPrint(
       SlotStr,
@@ -86,7 +97,7 @@ ShellAppMain (
   Print(L"\n");
   return 0;
 }
-
+*/
   /*
   UINTN Slot;
   UINT8 Masked = 0x00;
