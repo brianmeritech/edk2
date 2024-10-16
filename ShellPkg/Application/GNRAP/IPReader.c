@@ -102,7 +102,24 @@ ShellAppMain (
   }
   else {
     if (!StrCmp(OpCmd, L"-W")) {      //Write IP Info
-      //TBD
+      IPv4_ADDRESS Addr;
+      Status = StrToIpv4Address(
+        Argv[2], NULL, &Addr, NULL
+      );
+
+      if (!EFI_ERROR(Status)) {
+        Status = SaveIPAddr(&Addr);
+        if (!EFI_ERROR(Status)) {
+          Print(L"  Write BOARD IP:%d.%d.%d.%d OK\n",
+            Addr.Addr[0], Addr.Addr[1], Addr.Addr[2], Addr.Addr[3]);
+        }
+        else {
+          Print(L"  [ERROR] Failed to Save Address number...\n");
+        }
+      }
+      else {
+        Print(L"  [ERROR] Invalid Address number...\n");
+      }
     }
   }
 
@@ -112,7 +129,6 @@ ShellAppMain (
 
   return Status;
 }
-
 
 void PrintHelpMsg(void)
 {

@@ -60,6 +60,7 @@
 #define CMD_SET_IP_INFO						      0x78
 
 #define GET_IP_INFO_DONE                0xB1
+#define SET_IP_INFO_DONE                0xB8
 
 #define TYPE_IP_ADDRESS						      1
 #define TYPE_SUBNET_MASK					      2
@@ -429,5 +430,32 @@ GetIPAddr(
     }
   }
 
+  return Status;
+}
+
+EFI_STATUS
+SaveIPAddr(
+  IPv4_ADDRESS* Addr
+)
+{
+  EFI_STATUS Status = EFI_INVALID_PARAMETER;
+
+  InitTxPkt();
+  InitRxPkt();
+
+  gTxPkt[CMD_INDX] = CMD_SET_IP_INFO;
+  gTxPkt[DAT1_INDX] = TYPE_IP_ADDRESS;
+  gTxPkt[DAT2_INDX] = Addr->Addr[0];
+  gTxPkt[DAT3_INDX] = Addr->Addr[1];
+  gTxPkt[DAT4_INDX] = Addr->Addr[2];
+  gTxPkt[DAT5_INDX] = Addr->Addr[3];
+
+  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+
+  if (!EFI_ERROR(ReadUartData())) {
+    if (gRxPkt[CMD_INDX] == SET_IP_INFO_DONE) {
+      Status = EFI_SUCCESS;
+    }
+  }
   return Status;
 }
