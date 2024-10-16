@@ -28,6 +28,7 @@
 
 #define MAX_LED_NUMBER                  8
 #define MAX_LED_TABLE                   2
+#define MAX_SLOT_NUMBER                 8
 
 // --- Command Definition
 #define CMD_CHECK_CONNECTION			      0x41
@@ -282,4 +283,30 @@ GetSlotCount(
   }
 
   return Status;
+}
+
+EFI_STATUS
+SetSlotCountAct(
+  CHAR16* SlotAct
+  )
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+  UINT8 ActTyp[MAX_SLOT_NUMBER];
+
+  for (UINT8 i = 0; i < MAX_SLOT_NUMBER; i++) {
+    switch (CharToUpper(SlotAct[i])) {
+    case 0x0058:        //X NO Action
+      ActTyp[i] = 0;
+      break;
+    case 0x002B:        //+ Increase
+      ActTyp[i] = 1;
+      break;
+    case 0x0052:        //R Reset
+      ActTyp[i] = 2;
+      break;
+    }
+  }
+
+  return Status;
+
 }

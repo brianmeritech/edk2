@@ -182,7 +182,12 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-SC")) { // Set Memory Slot Count Action
-
+      Status = SetSlotCountAct(Argv[2]);
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Set Memory Socket Count Action %s OK\n", Argv[2]);
+      }else {
+        Print(L"  [ERROR] Set Memory Socket Count Action\n");
+      }
     }
 
     if (!StrCmp(OpCmd, L"-GF")) { // Get Fan RPM
