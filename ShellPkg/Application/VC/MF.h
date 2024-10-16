@@ -52,7 +52,8 @@ SetSlotCountAct(
 
 
 EFI_STATUS
-GetOutVoltage(
+GetVRVoltage(
+  UINT8,
   UINTN,
   UINT16*
   );

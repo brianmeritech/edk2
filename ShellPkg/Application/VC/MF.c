@@ -338,7 +338,8 @@ SetSlotCountAct(
 }
 
 EFI_STATUS
-GetOutVoltage(
+GetVRVoltage(
+  UINT8 Type,
   UINTN Channel,
   UINT16* Vol
   )
@@ -347,12 +348,12 @@ GetOutVoltage(
 
   InitTxPkt();
   InitRxPkt();
-  gTxPkt[CMD_INDX] = CMD_GET_CUR_VOLTAGE;
+  gTxPkt[CMD_INDX] = Type;
   gTxPkt[DAT1_INDX] = (UINT8)Channel;
   SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
   if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == GET_CUR_VOLTAGE_DONE) {
+    if (gRxPkt[CMD_INDX] == Type+0x40) {
       *Vol = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
       Status = EFI_SUCCESS;
     }

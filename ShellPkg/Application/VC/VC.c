@@ -156,7 +156,7 @@ ShellAppMain (
         return EFI_UNSUPPORTED;
       }
 
-      Status = GetOutVoltage(Channel, &Vol);
+      Status = GetVRVoltage(0x52, Channel, &Vol);     // Get Current Voltage cmd 0x52
       if (!EFI_ERROR(Status)) {
         Print(L"  Get %s voltage: %d (mV)\n", StrVolCh[Channel - 1], Vol);
       }
@@ -166,7 +166,21 @@ ShellAppMain (
     }
 
     if (!StrCmp(OpCmd, L"-GB")) { // Get Boot voltage
+      UINTN Channel;
+      UINT16 Vol;
+      Channel = StrDecimalToUintn(Argv[2]);
+      if (Channel == 0 || Channel > 5) {
+        Print(L"  [ERROR] Get BOOT-V Channel number\n");
+        return EFI_UNSUPPORTED;
+      }
 
+      Status = GetVRVoltage(0x54, Channel, &Vol);     // Get Boot Voltage cmd 0x54
+      if (!EFI_ERROR(Status)) {
+        Print(L"  Get %s BOOT voltage: %d (mV)\n", StrVolCh[Channel - 1], Vol);
+      }
+      else {
+        Print(L"  [ERROR] Get %s BOOT voltage Error\n", StrVolCh[Channel - 1]);
+      }
     }
 
     if (!StrCmp(OpCmd, L"-GC")) { // Get Memory Slot Count
