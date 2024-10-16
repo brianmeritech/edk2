@@ -163,9 +163,9 @@
   #ShellPkg/Application/AcpiViewApp/AcpiViewApp.inf
   #ShellPkg/Application/SerialTest/SerialTest.inf
   ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf
-  ShellPkg/Application/VC/VC.inf
-  ShellPkg/Application/IPReader/IPReader.inf
-  ShellPkg/Application/IDReader/IDReader.inf
+  ShellPkg/Application/GNRAP/VC.inf
+  ShellPkg/Application/GNRAP/IPReader.inf
+  ShellPkg/Application/GNRAP/IDReader.inf
   
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

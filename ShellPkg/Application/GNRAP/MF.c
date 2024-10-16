@@ -56,6 +56,22 @@
 #define SET_LED_STATUS_DONE             0xA4
 #define SET_FAN_PWM_DOEN                0xA8
 
+#define CMD_CHECK_CONNECTION				    0x41
+#define CMD_GET_IP_INFO						      0x71
+#define CMD_SET_IP_INFO						      0x78
+
+#define TYPE_IP_ADDRESS						      1
+#define TYPE_SUBNET_MASK					      2
+#define TYPE_GATEWAY						        3
+
+#define CMD_GET_BOARD_ID					      0x72
+#define CMD_SET_BOARD_ID					      0x73
+#define CMD_GET_BOARD_SN					      0x74
+#define CMD_SET_BOARD_SN					      0x75
+
+#define BOARD_SN							          1
+#define BOARD_ID							          2
+
 UINT8 gTxPkt[SIZE_CMD_PACKET];
 UINT8 gRxPkt[SIZE_CMD_PACKET];
 
