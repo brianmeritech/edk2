@@ -174,6 +174,9 @@ ShellAppMain (
           if (!EFI_ERROR(Status)) {
             Print(L"  Get Memory Socket %d Count : %d OK\n", Slot, Count);
           }
+          else {
+            Print(L"  [ERROR] Get Memory Socket %d Count\n", Slot);
+          }
         }
       }
     }
@@ -350,7 +353,7 @@ GetIDFunc(
   Status = GetFWVersion(&V1, &V2, &V3);
 
   VA_START(Marker, VerStr);
-  bufSize = SPrintLength(str, Marker);
+  bufSize = SPrintLength(VerStr, Marker);
   VA_END(Marker);
 
   Print(L"STR Buffer Size %d\n", bufSize);  
@@ -385,7 +388,8 @@ GetIDFunc(
     0
   );
 
-  SetLEDStatus(L"BBBBBBBB");    
+  SetLEDStatus(L"BBBBBBBB");
+
   VA_START(Marker, SlotStr);
   bufSize = SPrintLength(SlotStr, Marker);
   VA_END(Marker);
@@ -406,7 +410,7 @@ GetIDFunc(
     );
 
     if (EFI_ERROR(Status)) {
-      Print(L"  Failed to write SPCLED.txt\n");
+      Print(L"  Failed to write Slot%d SPCLED.txt\n");
     }
   }
 
