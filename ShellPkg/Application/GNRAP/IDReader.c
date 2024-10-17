@@ -65,6 +65,7 @@ ShellAppMain (
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   CHAR16 OpCmd1[SIZE_CMD_ARGS] = { 0, };
   CHAR16 OpCmd2[SIZE_CMD_ARGS] = { 0, };
+  EFI_FILE_PROTOCOL* InfoFile;
   
   UnicodeSPrintAsciiFormat(
     &Date[0],
@@ -96,6 +97,7 @@ ShellAppMain (
       Print(L"  [ERROR] Not enough command options.\n");
     }
     else {
+      UINTN size = 0;
       ToUpperCase(Argv[1], OpCmd2);     
       Status = InitFileHandle();
       if (EFI_ERROR(Status)) {
@@ -108,11 +110,28 @@ ShellAppMain (
           0x74,     //Get SN
           AsciiStr
         );
-
+        size = AsciiStrLen(AsciiStr);
         if (!EFI_ERROR(Status)) {
-
+          Status = gRoot->Open(
+            gRoot,
+            &InfoFile,
+            L"EP_R_SN.TXT",
+            EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+            0
+          );
+          if (!EFI_ERROR(Status)) {
+            Print(L"  SN : [%s]\n", AsciiStr);
+            Status = InfoFile->Write(
+              InfoFile,
+              &size,
+              AsciiStr
+            );
+            if (!EFI_ERROR(Status)) {            
+              Print(L"  EP_R_SN.TXT file create Ok!\n\n");
+            }
+            InfoFile->Close(InfoFile);
+          }
         }
-
       }
       else if (!StrCmp(OpCmd2, L"-ID")) { //Read Board ID
         Status = GetBoardInfo(
@@ -121,7 +140,28 @@ ShellAppMain (
         );
 
         if (!EFI_ERROR(Status)) {
-
+          size = AsciiStrLen(AsciiStr);
+          if (!EFI_ERROR(Status)) {
+            Status = gRoot->Open(
+              gRoot,
+              &InfoFile,
+              L"EP_R_ID.TXT",
+              EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+              0
+            );
+            if (!EFI_ERROR(Status)) {
+              Print(L"  ID : [%s]\n", AsciiStr);
+              Status = InfoFile->Write(
+                InfoFile,
+                &size,
+                AsciiStr
+              );
+              if (!EFI_ERROR(Status)) {
+                Print(L"  EP_R_ID.TXT file create Ok!\n\n");
+              }
+              InfoFile->Close(InfoFile);
+            }
+          }
         }
       }
     }
