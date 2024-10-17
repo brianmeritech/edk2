@@ -96,7 +96,7 @@ ShellAppMain (
       Status = ReadIPInfo();
 
       if (!EFI_ERROR(Status)) {
-        Print(L"  ReadIp.TXT file create Ok!\n\n");
+        Print(L"  ReadIp.TXT file create Ok! %r\n\n", Status);
       }
     }
   }

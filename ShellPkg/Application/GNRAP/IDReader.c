@@ -133,7 +133,6 @@ ShellAppMain (
           0x72,   // Get ID
           AsciiStr
         );
-
         if (!EFI_ERROR(Status)) {
           Status = SaveToFile(IDFileName);
           if (!EFI_ERROR(Status)) {
@@ -224,7 +223,7 @@ InitFileHandle(
   );
 
   if (EFI_ERROR(Status)) {
-    Print(L"  Failed to Open File System\n");
+    Print(L"  Failed to Open File System %r\n", Status);
     return Status;
   }
 
@@ -234,7 +233,7 @@ InitFileHandle(
   );
 
   if (EFI_ERROR(Status)) {
-    Print(L"  Failed to Open Root\n");
+    Print(L"  Failed to Open Root %r\n", Status);
     return Status;
   }
 
@@ -264,12 +263,12 @@ SaveToFile(
         AsciiStr
       );
       if (!EFI_ERROR(Status)) {
-        Print(L"  %s file create Ok!\n\n", FileStr);
+        Print(L"  %s file create Ok! %r\n\n", FileStr, Status);
       }
       InfoFile->Close(InfoFile);
   }
   else {
-    Print(L"  %s file Open error!\n\n", FileStr);
+    Print(L"  %s file Open error! %r\n\n", FileStr, Status);
   }
 
   return Status;
