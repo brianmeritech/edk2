@@ -114,17 +114,17 @@ ShellAppMain (
             Addr.Addr[0], Addr.Addr[1], Addr.Addr[2], Addr.Addr[3]);
         }
         else {
-          Print(L"  [ERROR] Failed to Save Address number...\n");
+          Print(L"  [ERROR] Failed to Save Address number...%r\n", Status);
         }
       }
       else {
-        Print(L"  [ERROR] Invalid Address number...\n");
+        Print(L"  [ERROR] Invalid Address number...%r\n", Status);
       }
     }
   }
 
   if (EFI_ERROR(Status)) {
-    Print(L"  [ERROR] %s is not valid command.\n", OpCmd);
+    Print(L"  [ERROR] %s is not valid command %r.\n", OpCmd, Status);
   }
 
   return Status;
@@ -165,7 +165,7 @@ InitFileHandle(
   );
 
   if (EFI_ERROR(Status)) {
-    Print(L"  Failed to Open File System\n");
+    Print(L"  Failed to Open File System %r\n", Status);
     return Status;
   }
 
@@ -175,8 +175,7 @@ InitFileHandle(
   );
 
   if (EFI_ERROR(Status)) {
-    Print(L"  Failed to Open Root\n");
-    return Status;
+    Print(L"  Failed to Open Root %r\n", Status);    
   }
 
   return Status;
@@ -205,13 +204,14 @@ ReadIPInfo(
   Status = InitFileHandle();
   if (EFI_ERROR(Status)) return Status;
 
-  gRoot->Open(
+  Status = gRoot->Open(
     gRoot,
     &IpFile,
     L"ReadIp.TXT",
     EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
     0
   );
+  if (EFI_ERROR(Status)) return Status;
 
   Status = GetIPAddr(&IPAddr);
   if (EFI_ERROR(Status)) return Status;
