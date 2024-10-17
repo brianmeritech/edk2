@@ -74,4 +74,10 @@ SaveIPAddr(
   IPv4_ADDRESS*
 );
 
+EFI_STATUS
+SaveBoardInfo(
+  UINT8,
+  CHAR16*
+);
+
 #endif

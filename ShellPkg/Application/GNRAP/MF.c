@@ -459,3 +459,23 @@ SaveIPAddr(
   }
   return Status;
 }
+
+
+EFI_STATUS
+SaveBoardInfo(
+  UINT8 Type,
+  CHAR8* InfoStr
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  InitTxPkt();
+  InitRxPkt();
+
+
+
+
+
+
+  return Status;
+}

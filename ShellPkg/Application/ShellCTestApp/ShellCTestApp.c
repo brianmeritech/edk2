@@ -47,6 +47,44 @@ ShellAppMain(
   IN CHAR16** Argv
 )
 {
+  EFI_STATUS Status;
+ 
+  CHAR8 Str[18];
+  UINTN size;
+
+  size = StrLen(Argv[1]);
+
+  Print(L"%s\n", Argv[1]);
+  Print(L"1Size = %d\n", size);
+
+  Status = UnicodeStrToAsciiStrS(
+    Argv[1],
+    Str,
+    sizeof(Str)
+  );
+
+  Print(L"Status %r \n", Status);
+
+  for (UINTN i = 0; i < sizeof(Str); i++) {
+    Print(L"%X\n", Str[i]);
+    Print(L"%c\n", Str[i]);
+  }
+
+  /*
+  size = StrLen(Argv[1]);
+
+  Print(L"1Size = %d\n", size);
+  
+  for (UINTN i = 0; i < 16; i++) {
+    Print(L"%x", *(pStr+i));
+    Print(L"\n");
+  }
+  */
+  return 0;
+}
+
+/*
+{
   EFI_STATUS Status = EFI_UNSUPPORTED;
 
   EFI_FILE_PROTOCOL* gRoot = NULL;
@@ -80,6 +118,7 @@ ShellAppMain(
   return Status;
 
 }
+*/
 
 /*
 {
