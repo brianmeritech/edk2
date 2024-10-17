@@ -81,6 +81,11 @@ ShellAppMain (
     return Status;
   }
 
+  Status = InitSerialPort();
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to configure Serial Port %r \n", Status);
+  }
+
   ToUpperCase(Argv[1], OpCmd1);
   
   if (!StrCmp(OpCmd1, L"-CC")) {          // Check Connection

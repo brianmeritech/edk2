@@ -92,19 +92,14 @@ ShellAppMain (
     PrintHelpMsg();
     return Status;
   }
-
+    
+  Status = InitSerialPort();
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to configure Serial Port %r \n", Status);
+  }
+  
   SetMem16(OpCmd, SIZE_ARGUMENT_MAX, 0);
-
   ToUpperCase(Argv[1], OpCmd);
-
-  Status = InitSerialPort();
-  if (EFI_ERROR(Status)) {
-    Print(L"  Failed to configure Serial Port %r \n", Status);
-  }
-  Status = InitSerialPort();
-  if (EFI_ERROR(Status)) {
-    Print(L"  Failed to configure Serial Port %r \n", Status);
-  }
 
   if(Argc == 2) {
     if (!StrCmp(OpCmd, L"-H")) {

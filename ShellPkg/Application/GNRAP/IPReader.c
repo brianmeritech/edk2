@@ -84,12 +84,12 @@ ShellAppMain (
   Print(L"IPReader for PCT3.0 GNRAP MRDIMM V%d.%d.%d %s\n",
     VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, Date);
 
-  ToUpperCase(Argv[1], OpCmd);
-
   Status = InitSerialPort();
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to configure Serial Port %r \n", Status);
   }
+
+  ToUpperCase(Argv[1], OpCmd);
     
   if (Argc == 2) {
     if (!StrCmp(OpCmd, L"-R")) {      //Read IP Info
