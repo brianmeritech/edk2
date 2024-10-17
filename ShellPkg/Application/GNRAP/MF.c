@@ -30,6 +30,8 @@
 #define MAX_SLOT_NUMBER                 8
 #define MAX_SLOT_TABLE                  2
 
+#define MAX_BOARD_INFO_TABLE            4
+
 // --- Command Definition
 #define CMD_CHECK_CONNECTION			      0x41
 #define CMD_PORT80_DATA						      0x42
@@ -468,14 +470,39 @@ SaveBoardInfo(
 )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
-
+  
   InitTxPkt();
   InitRxPkt();
+  
+  gTxPkt[CMD_INDX] = Cmd;
 
+  for (UINTN i = 0; i < MAX_BOARD_INFO_TABLE; i++) {    
+    gTxPkt[DAT1_INDX] = (UINT8)i;    // Index of ID String
+    gTxPkt[DAT2_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE));
+    gTxPkt[DAT3_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE) + 1);
+    gTxPkt[DAT4_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE) + 2);
+    gTxPkt[DAT5_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE) + 3);
 
+    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
-
-
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == Cmd+0x40) {
+        Status = EFI_SUCCESS;
+        continue;        
+      }
+      else {
+        Status = EFI_NOT_READY;
+        if (Cmd == CMD_SET_BOARD_ID) {
+          Print(L"  [ERROR] Write ID error.index = %d\n", i);
+        }
+        else if (Cmd == CMD_SET_BOARD_SN) {
+          Print(L"  [ERROR] Write SN error.index = %d\n", i);
+        }
+        break;
+      }
+    }
+    gBS->Stall(150);
+  }
 
   return Status;
 }

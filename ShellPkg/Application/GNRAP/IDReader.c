@@ -122,6 +122,9 @@ ShellAppMain (
           0x75,  //Set SN
           AsciiStr
         );
+
+        
+
       }
       else if (!StrCmp(OpCmd2, L"-ID")) { //Write Board ID
         Status = SaveBoardInfo(
