@@ -47,17 +47,7 @@
   BaseMemoryLib
   FileHandleLib
   PrintLib
-  
-[Guids]
-
-
-[Ppis]
-
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid
-
-[FeaturePcd]
-
-[Pcd]
 

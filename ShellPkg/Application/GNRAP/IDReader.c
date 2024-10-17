@@ -20,6 +20,8 @@
 #define MAX_ARGUMENT_STRING     16
 #define SIZE_CMD_ARGS						16
 
+CHAR16 Date[12];
+
  /*Function declaration*/
 void
 PrintHelpMsg(
@@ -55,8 +57,7 @@ ShellAppMain (
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   CHAR16 OpCmd1[SIZE_CMD_ARGS] = { 0, };
   CHAR16 OpCmd2[SIZE_CMD_ARGS] = { 0, };
-  CHAR16 Date[12];
-
+  
   UnicodeSPrintAsciiFormat(
     &Date[0],
     sizeof(Date),
@@ -74,8 +75,13 @@ ShellAppMain (
   ToUpperCase(Argv[1], OpCmd1);
   
   if (!StrCmp(OpCmd1, L"-CC")) {          // Check Connection
-    //TBD
-
+    Status = CheckConnect();
+    if (!EFI_ERROR(Status)) {
+      Print(L"  Connection Ok!\n");
+    }
+    else {
+      Print(L"  Connection Error!\n");
+    }
   }
   else if (!StrCmp(OpCmd1, L"-R")) {      // Read Board ID
     if (Argc < 3) {

@@ -13,7 +13,11 @@
 #include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/ShellCEntryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
+#include <Protocol/SimpleFileSystem.h>
+
+/*
 #define	VERSION_MAJOR						        0			// Major version
 #define	VERSION_MINOR						        1			// Minor version 1
 #define	VERSION_BUILD						        0			// Build version
@@ -21,7 +25,7 @@
 #define V1                              1
 #define V2                              2
 #define V3                              3
-
+*/
 /**
   UEFI application entry point which has an interface similar to a
   standard C main function.
@@ -43,6 +47,42 @@ ShellAppMain(
   IN CHAR16** Argv
 )
 {
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  EFI_FILE_PROTOCOL* gRoot = NULL;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
+
+  Status = gBS->LocateProtocol(
+    &gEfiSimpleFileSystemProtocolGuid,
+    NULL,
+    (VOID**)&gSimpleFileSystem
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open File System\n");
+    return Status;
+  }
+
+  Print(L"  Open File System %r\n", Status);
+
+  Status = gSimpleFileSystem->OpenVolume(
+    gSimpleFileSystem,
+    &gRoot
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open Root\n");
+    return Status;
+  }
+
+  Print(L"  Open File Root %r\n", Status);
+
+  return Status;
+
+}
+
+/*
+{
   EFI_STATUS Status;
   IPv4_ADDRESS Addr;
   Status = StrToIpv4Address(
@@ -53,7 +93,7 @@ ShellAppMain(
 
   return Status;
 }
-/*
+
   CHAR16 str[] = L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n";
   CHAR16 SlotStr[] = L"Slot%d B\n";
   VA_LIST Marker;

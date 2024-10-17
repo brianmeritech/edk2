@@ -10,4 +10,6 @@
 #include <Library/ShellCEntryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include <Protocol/SimpleFileSystem.h>
+
 #endif

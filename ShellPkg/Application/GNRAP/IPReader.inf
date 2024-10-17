@@ -45,14 +45,6 @@
   BaseMemoryLib
   SerialPortLib
 
-[Guids]
-
-[Ppis]
-
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid
-
-[FeaturePcd]
-
-[Pcd]
 
