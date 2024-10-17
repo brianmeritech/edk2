@@ -20,6 +20,9 @@
 #define MAX_ARGUMENT_STRING     16
 #define SIZE_CMD_ARGS						16
 
+EFI_FILE_PROTOCOL* gRoot = NULL;
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
+
 CHAR16 Date[12];
 CHAR8 AsciiStr[18];
  /*Function declaration*/
@@ -31,6 +34,11 @@ PrintHelpMsg(
 void ToUpperCase(
   CHAR16*,
   CHAR16*
+);
+
+EFI_STATUS
+InitFileHandle(
+  void
 );
 
 /**
@@ -88,16 +96,33 @@ ShellAppMain (
       Print(L"  [ERROR] Not enough command options.\n");
     }
     else {
-      ToUpperCase(Argv[1], OpCmd2);
-      if (!StrCmp(OpCmd2, L"-SN")) {      // Read Board SN
-        //TBD
+      ToUpperCase(Argv[1], OpCmd2);     
+      Status = InitFileHandle();
+      if (EFI_ERROR(Status)) {
+        Print(L"  Failed to Locate File System %r\n", Status);
+        return Status;
+      }
 
+      if (!StrCmp(OpCmd2, L"-SN")) {      // Read Board SN
+        Status = GetBoardInfo(
+          0x74,     //Get SN
+          AsciiStr
+        );
+
+        if (!EFI_ERROR(Status)) {
+
+        }
 
       }
       else if (!StrCmp(OpCmd2, L"-ID")) { //Read Board ID
-        //TBD
+        Status = GetBoardInfo(
+          0x72,   // Get ID
+          AsciiStr
+        );
 
+        if (!EFI_ERROR(Status)) {
 
+        }
       }
     }
   }
@@ -166,4 +191,35 @@ void ToUpperCase(CHAR16* src, CHAR16* dest)
     src++;
     dest++;
   }
+}
+
+EFI_STATUS
+InitFileHandle(
+  void
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+
+  Status = gBS->LocateProtocol(
+    &gEfiSimpleFileSystemProtocolGuid,
+    NULL,
+    (VOID**)&gSimpleFileSystem
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open File System\n");
+    return Status;
+  }
+
+  Status = gSimpleFileSystem->OpenVolume(
+    gSimpleFileSystem,
+    &gRoot
+  );
+
+  if (EFI_ERROR(Status)) {
+    Print(L"  Failed to Open Root\n");
+    return Status;
+  }
+
+  return Status;
 }

@@ -483,8 +483,7 @@ SaveBoardInfo(
 
     if (!EFI_ERROR(ReadUartData())) {
       if (gRxPkt[CMD_INDX] == Cmd+0x40) {
-        Status = EFI_SUCCESS;
-        continue;        
+        Status = EFI_SUCCESS;       
       }
       else {
         Status = EFI_NOT_READY;
