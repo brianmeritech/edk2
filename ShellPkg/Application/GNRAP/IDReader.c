@@ -122,15 +122,18 @@ ShellAppMain (
           0x75,  //Set SN
           AsciiStr
         );
-
-        
-
+        if (!EFI_ERROR(Status)) {
+          Print(L"  Write SN [%s] OK\n", Argv[3]);
+        }
       }
       else if (!StrCmp(OpCmd2, L"-ID")) { //Write Board ID
         Status = SaveBoardInfo(
           0x73,  //Set ID
           AsciiStr
         );
+        if (!EFI_ERROR(Status)) {
+          Print(L"  Write ID [%s] OK\n", Argv[3]);
+        }
       }
     }
   }
