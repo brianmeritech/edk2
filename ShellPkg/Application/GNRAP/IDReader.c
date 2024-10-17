@@ -105,7 +105,7 @@ ShellAppMain (
     if (Argc < 4) {
       Print(L"  [ERROR] Not enough command options.\n");      
     }
-    else {
+    else {     
       ToUpperCase(Argv[2], OpCmd2);
       Status = UnicodeStrToAsciiStrS(
         Argv[3],
@@ -113,11 +113,11 @@ ShellAppMain (
         sizeof(AsciiStr)
       );
 
-      //if (EFI_ERROR(Status) || StrLen(Argv[3]) != MAX_ARGUMENT_STRING) {
-      //  Print(L"  [ERROR] BOARD ID/SN %s are not valid.\n", Argv[3]);
-      //}
+      if (EFI_ERROR(Status) || StrLen(Argv[3]) != MAX_ARGUMENT_STRING) {
+        Print(L"  [ERROR] BOARD ID/SN %s are not valid.\n", Argv[3]);
+      }
 
-      if (!StrCmp(OpCmd2, L"-SN")) {      //Write Board SN
+      if (!StrCmp(OpCmd2, L"-SN")) {      //Write Board SN      
         Status = SaveBoardInfo(
           0x75,  //Set SN
           AsciiStr
