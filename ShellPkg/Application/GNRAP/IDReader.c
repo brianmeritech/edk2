@@ -25,6 +25,8 @@ EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
 
 CHAR16 Date[12];
 CHAR8 AsciiStr[18];
+CHAR16 SNFileName[] = L"EP_R_SN.TXT";
+CHAR16 IDFileName[] = L"EP_R_ID.TXT";
  /*Function declaration*/
 void
 PrintHelpMsg(
@@ -39,6 +41,11 @@ void ToUpperCase(
 EFI_STATUS
 InitFileHandle(
   void
+);
+
+EFI_STATUS
+SaveToFile(
+  CHAR16*  
 );
 
 /**
@@ -65,8 +72,7 @@ ShellAppMain (
   EFI_STATUS  Status = EFI_INVALID_PARAMETER;
   CHAR16 OpCmd1[SIZE_CMD_ARGS] = { 0, };
   CHAR16 OpCmd2[SIZE_CMD_ARGS] = { 0, };
-  EFI_FILE_PROTOCOL* InfoFile;
-  
+    
   UnicodeSPrintAsciiFormat(
     &Date[0],
     sizeof(Date),
@@ -106,7 +112,6 @@ ShellAppMain (
       ToUpperCase(Argv[1], OpCmd2);     
       Status = InitFileHandle();
       if (EFI_ERROR(Status)) {
-        Print(L"  Failed to Locate File System %r\n", Status);
         return Status;
       }
 
@@ -117,24 +122,9 @@ ShellAppMain (
         );
         size = AsciiStrLen(AsciiStr);
         if (!EFI_ERROR(Status)) {
-          Status = gRoot->Open(
-            gRoot,
-            &InfoFile,
-            L"EP_R_SN.TXT",
-            EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
-            0
-          );
+          Status = SaveToFile(SNFileName);
           if (!EFI_ERROR(Status)) {
-            Print(L"  SN : [%s]\n", AsciiStr);
-            Status = InfoFile->Write(
-              InfoFile,
-              &size,
-              AsciiStr
-            );
-            if (!EFI_ERROR(Status)) {            
-              Print(L"  EP_R_SN.TXT file create Ok!\n\n");
-            }
-            InfoFile->Close(InfoFile);
+            Print(L"  SN : [%s]\n", AsciiStr);            
           }
         }
       }
@@ -145,28 +135,10 @@ ShellAppMain (
         );
 
         if (!EFI_ERROR(Status)) {
-          size = AsciiStrLen(AsciiStr);
+          Status = SaveToFile(IDFileName);
           if (!EFI_ERROR(Status)) {
-            Status = gRoot->Open(
-              gRoot,
-              &InfoFile,
-              L"EP_R_ID.TXT",
-              EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
-              0
-            );
-            if (!EFI_ERROR(Status)) {
-              Print(L"  ID : [%s]\n", AsciiStr);
-              Status = InfoFile->Write(
-                InfoFile,
-                &size,
-                AsciiStr
-              );
-              if (!EFI_ERROR(Status)) {
-                Print(L"  EP_R_ID.TXT file create Ok!\n\n");
-              }
-              InfoFile->Close(InfoFile);
-            }
-          }
+            Print(L"  ID : [%s]\n", AsciiStr);            
+          }          
         }
       }
     }
@@ -264,6 +236,40 @@ InitFileHandle(
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to Open Root\n");
     return Status;
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+SaveToFile(
+  CHAR16* FileStr
+)
+{
+  EFI_STATUS Status = EFI_UNSUPPORTED;
+  EFI_FILE_PROTOCOL* InfoFile;
+  UINTN size = AsciiStrLen(AsciiStr);
+
+  Status = gRoot->Open(
+      gRoot,
+      &InfoFile,
+      FileStr,
+      EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+      0
+  );
+  if (!EFI_ERROR(Status)) {      
+      Status = InfoFile->Write(
+        InfoFile,
+        &size,
+        AsciiStr
+      );
+      if (!EFI_ERROR(Status)) {
+        Print(L"  %s file create Ok!\n\n", FileStr);
+      }
+      InfoFile->Close(InfoFile);
+  }
+  else {
+    Print(L"  %s file Open error!\n\n", FileStr);
   }
 
   return Status;
