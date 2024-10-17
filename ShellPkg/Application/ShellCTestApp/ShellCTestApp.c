@@ -65,11 +65,15 @@ ShellAppMain(
 
   Print(L"Status %r \n", Status);
 
-  for (UINTN i = 0; i < sizeof(Str); i++) {
-    Print(L"%X\n", Str[i]);
-    Print(L"%c\n", Str[i]);
-  }
+  Print(L"Ascii Str %d\n", AsciiStrLen(Str));
 
+  for (UINTN i = 0; i < AsciiStrLen(Str); i++) {
+    Print(L"%X", Str[i]);    
+  }
+  Print(L"\n");
+  for (UINTN i = 0; i < AsciiStrLen(Str); i++) {
+    Print(L"%c", Str[i]);
+  }
   /*
   size = StrLen(Argv[1]);
 

@@ -463,7 +463,7 @@ SaveIPAddr(
 
 EFI_STATUS
 SaveBoardInfo(
-  UINT8 Type,
+  UINT8 Cmd,
   CHAR8* InfoStr
 )
 {

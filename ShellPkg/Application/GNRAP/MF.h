@@ -77,7 +77,7 @@ SaveIPAddr(
 EFI_STATUS
 SaveBoardInfo(
   UINT8,
-  CHAR16*
+  CHAR8*
 );
 
 #endif

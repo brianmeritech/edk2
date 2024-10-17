@@ -16,12 +16,12 @@
 #define VERSION_MAJOR						0
 #define VERSION_MINOR						1
 #define VERSION_BUILD					  0
-
+ 
 #define MAX_ARGUMENT_STRING     16
 #define SIZE_CMD_ARGS						16
 
 CHAR16 Date[12];
-
+CHAR8 AsciiStr[18];
  /*Function declaration*/
 void
 PrintHelpMsg(
@@ -107,12 +107,27 @@ ShellAppMain (
     }
     else {
       ToUpperCase(Argv[2], OpCmd2);
-      if (!StrCmp(OpCmd2, L"-SN")) {      //Write Board SN
-        // TBD
+      Status = UnicodeStrToAsciiStrS(
+        Argv[3],
+        AsciiStr,
+        sizeof(AsciiStr)
+      );
 
+      //if (EFI_ERROR(Status) || StrLen(Argv[3]) != MAX_ARGUMENT_STRING) {
+      //  Print(L"  [ERROR] BOARD ID/SN %s are not valid.\n", Argv[3]);
+      //}
+
+      if (!StrCmp(OpCmd2, L"-SN")) {      //Write Board SN
+        Status = SaveBoardInfo(
+          0x75,  //Set SN
+          AsciiStr
+        );
       }
       else if (!StrCmp(OpCmd2, L"-ID")) { //Write Board ID
-        //TBD 
+        Status = SaveBoardInfo(
+          0x73,  //Set ID
+          AsciiStr
+        );
       }
     }
   }
