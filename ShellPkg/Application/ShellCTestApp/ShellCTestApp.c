@@ -65,15 +65,20 @@ ShellAppMain(
     return Status;
   }
 
-  P80Num = StrHexToUintn(Argv[2]);
-  UartTest[2] = (UINT8)P80Num & 0x0F;
-  UartTest[3] = ((UINT8)P80Num >> 4) & 0x0F;
+  if (Argc > 1) {
+
+    P80Num = StrHexToUintn(Argv[2]);
+    UartTest[2] = (UINT8)P80Num & 0x0F;
+    UartTest[3] = ((UINT8)P80Num >> 4) & 0x0F;
+  }
 
   RetBytes = SerialPortWrite(UartTest, NumBytes);
 
   if (RetBytes != 0) {
     Print(L"Serial Port Write Test Fail %d\n", RetBytes);
   }
+
+  Print(L"Serial Port Write %x \n", (UartTest[2]|UartTest[3] << 4));
    
   return 0;
 }
