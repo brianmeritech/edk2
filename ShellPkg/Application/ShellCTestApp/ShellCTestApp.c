@@ -14,6 +14,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/ShellCEntryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/SerialPortLib.h> //brnxxx 20241021 
 
 #include <Protocol/SimpleFileSystem.h>
 
@@ -48,7 +49,37 @@ ShellAppMain(
 )
 {
   EFI_STATUS Status;
- 
+  UINT8 UartTest[8] = {0x02, 0x42, 0x0B, 0x0B, 0x00, 0x00, 0x00, 0x03};  //post code test send
+  UINTN NumBytes;
+  UINTN RetBytes;
+  UINTN P80Num;
+
+  NumBytes = sizeof(UartTest);
+  RetBytes = 0xFF;
+  P80Num = 0;
+
+  Status = SerialPortInitialize();
+
+  if (EFI_ERROR(Status)) {
+    Print(L" Failed Serial Port Initialize \n");
+    return Status;
+  }
+
+  P80Num = StrHexToUintn(Argv[2]);
+  UartTest[2] = (UINT8)P80Num & 0x0F;
+  UartTest[3] = ((UINT8)P80Num >> 4) & 0x0F;
+
+  RetBytes = SerialPortWrite(UartTest, NumBytes);
+
+  if (RetBytes != 0) {
+    Print(L"Serial Port Write Test Fail %d\n", RetBytes);
+  }
+   
+  return 0;
+}
+
+/*
+
   CHAR8 Str[18];
   UINTN size;
 
@@ -68,7 +99,7 @@ ShellAppMain(
   Print(L"Ascii Str %d\n", AsciiStrLen(Str));
 
   for (UINTN i = 0; i < AsciiStrLen(Str); i++) {
-    Print(L"%X", Str[i]);    
+    Print(L"%X", Str[i]);
   }
   Print(L"\n");
   for (UINTN i = 0; i < AsciiStrLen(Str); i++) {
@@ -78,16 +109,15 @@ ShellAppMain(
   size = StrLen(Argv[1]);
 
   Print(L"1Size = %d\n", size);
-  
+
   for (UINTN i = 0; i < 16; i++) {
     Print(L"%x", *(pStr+i));
     Print(L"\n");
   }
   */
-  return 0;
-}
 
-/*
+
+/* 
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
 

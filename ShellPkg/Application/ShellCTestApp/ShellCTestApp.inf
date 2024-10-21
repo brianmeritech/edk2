@@ -35,6 +35,7 @@
   PrintLib
   BaseMemoryLib 
   PrintLib
+  SerialPortLib
 
   
 [Protocols]
