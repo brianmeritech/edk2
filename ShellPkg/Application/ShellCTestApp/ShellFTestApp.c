@@ -16,7 +16,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/SimpleFileSystem.h>
 
-/*
+
 #define	VERSION_MAJOR						        0			// Major version
 #define	VERSION_MINOR						        1			// Minor version 1
 #define	VERSION_BUILD						        0			// Build version
@@ -24,7 +24,7 @@
 #define V1                              1
 #define V2                              2
 #define V3                              3
-*/
+
 /**
   UEFI application entry point which has an interface similar to a
   standard C main function.
@@ -51,8 +51,10 @@ ShellAppMain(
   EFI_FILE_PROTOCOL* gRoot = NULL;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* gSimpleFileSystem = NULL;
   EFI_FILE_PROTOCOL* NewFile = NULL;
-
-  UINTN strsize=0;
+  CHAR16 str[] = L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n";
+  CHAR16 SlotStr[] = L"Slot%d B\n";
+  VA_LIST Marker;
+  UINTN bufSize;
 
   Status = gBS->LocateProtocol(
     &gEfiSimpleFileSystemProtocolGuid,
@@ -97,13 +99,43 @@ ShellAppMain(
   }
 
   if (!EFI_ERROR(Status)) {
-    CHAR8* pStr = "UEFI FILE SYSTEM TEST \n";
-    strsize = AsciiStrSize(pStr);
+    VA_START(Marker, str);
+    bufSize = SPrintLength(str, Marker);
+    VA_END(Marker);
+
+    UnicodeSPrint(
+      str,
+      bufSize,
+      L"VC S/W VERSION=%d.%d.%d\nVC F/W VERSION=%d.%d.%d\n",
+      VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD,
+      V1, V2, V3
+    );
+
     Status = NewFile->Write(
       NewFile,
-      &strsize,
-      pStr
+      &bufSize,
+      str
     );
+
+    VA_START(Marker, SlotStr);
+    bufSize = SPrintLength(SlotStr, Marker);
+    VA_END(Marker);
+
+    for (UINT8 i = 1; i < 9; i++) {
+      UnicodeSPrint(
+        SlotStr,
+        bufSize,
+        L"Slot%d B\n",
+        i
+      );
+      Status = NewFile->Write(
+        NewFile,
+        &bufSize,
+        SlotStr
+      );
+    }
+
+    
     if (!EFI_ERROR(Status)) {
       NewFile->Close(NewFile);
     }
