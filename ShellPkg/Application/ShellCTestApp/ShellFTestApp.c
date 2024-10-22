@@ -14,8 +14,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/ShellCEntryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/SerialPortLib.h> //brnxxx 20241021 
-
 #include <Protocol/SimpleFileSystem.h>
 
 /*

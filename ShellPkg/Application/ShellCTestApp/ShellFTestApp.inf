@@ -35,8 +35,7 @@
   PrintLib
   BaseMemoryLib 
   PrintLib
-  SerialPortLib
-
+  
   
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid
