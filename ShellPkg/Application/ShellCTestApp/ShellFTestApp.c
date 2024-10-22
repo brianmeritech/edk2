@@ -64,7 +64,6 @@ ShellAppMain(
     Print(L"  Failed to Open File System\n");
     return Status;
   }
-
   Print(L"  Open File System %r\n", Status);
 
   Status = gSimpleFileSystem->OpenVolume(
@@ -76,9 +75,7 @@ ShellAppMain(
     Print(L"  Failed to Open Root\n");
     return Status;
   }
-
   Print(L"  Open File Root %r\n", Status);
-
 
   if (Argc == 2 && Argv[2] != NULL) {
     Status = gRoot->Open(
@@ -113,7 +110,6 @@ ShellAppMain(
   }
 
   Status = gRoot->Close(gRoot);
-
   Print(L" gRoot Close %r\n", Status); 
 
   return Status;

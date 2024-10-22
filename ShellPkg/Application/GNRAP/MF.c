@@ -10,7 +10,6 @@
 
 #define RETRY                           5
 
-#define	RECV_BUFF_SIZE						      1024
 #define	SIZE_CMD_PACKET						      8
 #define STX									            0x02
 #define ETX									            0x03
@@ -519,10 +518,12 @@ GetBoardInfo(
     gTxPkt[DAT1_INDX] = (UINT8)i;
     SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
     if (!EFI_ERROR(ReadUartData())) {
-      *(InfoStr + (i * MAX_BOARD_INFO_TABLE)) = gRxPkt[DAT2_INDX];
-      *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 1) = gRxPkt[DAT3_INDX];
-      *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 2) = gRxPkt[DAT4_INDX];
-      *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 3) = gRxPkt[DAT5_INDX];
+      if (gRxpkt[CMD_INDX] == Cmd + 0x40) {
+        *(InfoStr + (i * MAX_BOARD_INFO_TABLE)) = gRxPkt[DAT2_INDX];
+        *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 1) = gRxPkt[DAT3_INDX];
+        *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 2) = gRxPkt[DAT4_INDX];
+        *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 3) = gRxPkt[DAT5_INDX];
+      }
     }
     else {
       Status = EFI_NOT_READY;
