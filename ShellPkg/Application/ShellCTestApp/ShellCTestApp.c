@@ -65,7 +65,7 @@ ShellAppMain(
     return Status;
   }
 
-  if (Argc > 1) {
+  if (Argc == 2 && Argv[2] != NULL) {
 
     P80Num = StrHexToUintn(Argv[2]);
     UartTest[2] = (UINT8)P80Num & 0x0F;

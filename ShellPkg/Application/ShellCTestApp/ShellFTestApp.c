@@ -80,7 +80,7 @@ ShellAppMain(
   Print(L"  Open File Root %r\n", Status);
 
 
-  if (Argc > 1) {
+  if (Argc == 2 && Argv[2] != NULL) {
     Status = gRoot->Open(
       gRoot,
       &NewFile,
