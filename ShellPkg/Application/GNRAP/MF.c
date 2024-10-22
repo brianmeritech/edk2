@@ -83,12 +83,14 @@ ReadUartData(
   void
   )
 {
+  UINTN ReadSize = 0;;
   for (UINT8 i = 0; i < RETRY; i++) {
     if (SerialPortPoll()) {
-      if (SerialPortRead(gRxPkt, SIZE_CMD_PACKET))
+      ReadSize = SerialPortRead(gRxPkt, SIZE_CMD_PACKET);
+      if (ReadSize == SIZE_CMD_PACKET)
         return EFI_SUCCESS;
       else
-        return EFI_NOT_FOUND;
+        return EFI_DEVICE_ERROR;
     }
     gBS->Stall(150);
   }
@@ -518,7 +520,7 @@ GetBoardInfo(
     gTxPkt[DAT1_INDX] = (UINT8)i;
     SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
     if (!EFI_ERROR(ReadUartData())) {
-      if (gRxpkt[CMD_INDX] == Cmd + 0x40) {
+      if (gRxPkt[CMD_INDX] == Cmd + 0x40) {
         *(InfoStr + (i * MAX_BOARD_INFO_TABLE)) = gRxPkt[DAT2_INDX];
         *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 1) = gRxPkt[DAT3_INDX];
         *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 2) = gRxPkt[DAT4_INDX];
