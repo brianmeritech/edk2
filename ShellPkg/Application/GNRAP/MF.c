@@ -77,6 +77,7 @@
 
 UINT8 gTxPkt[SIZE_CMD_PACKET];
 UINT8 gRxPkt[SIZE_CMD_PACKET];
+UINTN NumBytes = 0;
 
 EFI_STATUS
 ReadUartData(
@@ -132,11 +133,12 @@ CheckConnect(
   InitRxPkt();
 
   gTxPkt[CMD_INDX] = CMD_CHECK_CONNECTION;
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == CHECK_CONNECTION_DONE)
-      return EFI_SUCCESS;
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == CHECK_CONNECTION_DONE)
+        return EFI_SUCCESS;
+    }
   }
   return EFI_NOT_READY;  
 }
@@ -151,7 +153,8 @@ SetP80(
   gTxPkt[DAT1_INDX] = (UINT8)Dat & 0x0F;         //Low Byte
   gTxPkt[DAT2_INDX] = ((UINT8)Dat & 0xF0) >> 4;  //High Byte
 
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  
 }
 
 EFI_STATUS
@@ -166,14 +169,16 @@ GetFWVersion(
 
   gTxPkt[CMD_INDX] = CMD_GET_FW_VERSION;
   gTxPkt[DAT1_INDX] = 1; //Main MCU FW
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
 
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == GET_FW_VERSION_DONE) {
-      *pV1 = gRxPkt[DAT2_INDX];
-      *pV2 = gRxPkt[DAT3_INDX];
-      *pV3 = gRxPkt[DAT4_INDX];
-      return EFI_SUCCESS;
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == GET_FW_VERSION_DONE) {
+        *pV1 = gRxPkt[DAT2_INDX];
+        *pV2 = gRxPkt[DAT3_INDX];
+        *pV3 = gRxPkt[DAT4_INDX];
+        return EFI_SUCCESS;
+      }
     }
   }
   return EFI_NOT_READY;
@@ -191,13 +196,14 @@ GetFanRPM(
 
   gTxPkt[CMD_INDX] = CMD_GET_FAN_RPM;
   gTxPkt[DAT1_INDX] = (UINT8)FAN;
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == GET_FAN_RPM_DONE) {
-      tRPM = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
-      return tRPM;
-    }    
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == GET_FAN_RPM_DONE) {
+        tRPM = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
+        return tRPM;
+      }
+    }
   }
 
   return 0;
@@ -233,16 +239,17 @@ SetLEDStatus(
     gTxPkt[DAT3_INDX] = LedTyp[i * 4 + 1];
     gTxPkt[DAT4_INDX] = LedTyp[i * 4 + 2];
     gTxPkt[DAT5_INDX] = LedTyp[i * 4 + 3];
-    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-
-    if (!EFI_ERROR(ReadUartData())) {
-      if (gRxPkt[CMD_INDX] == SET_LED_STATUS_DONE) {
-        gBS->Stall(150);
-        Status = EFI_SUCCESS;
-      }
-      else {
-        Print(L"  [ERROR] Set LED Communication ERROR(%d)\n", i);
-        Status = EFI_UNSUPPORTED;
+    NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+    if (NumBytes == SIZE_CMD_PACKET) {
+      if (!EFI_ERROR(ReadUartData())) {
+        if (gRxPkt[CMD_INDX] == SET_LED_STATUS_DONE) {
+          gBS->Stall(150);
+          Status = EFI_SUCCESS;
+        }
+        else {
+          Print(L"  [ERROR] Set LED Communication ERROR(%d)\n", i);
+          Status = EFI_UNSUPPORTED;
+        }
       }
     }
   }
@@ -273,12 +280,13 @@ SetFanSpeed(
   gTxPkt[DAT1_INDX] = (UINT8)Channel;
   gTxPkt[DAT2_INDX] = (UINT8)Speed;
 
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-  
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == SET_FAN_PWM_DOEN) {
-      Status = EFI_SUCCESS;
-    }    
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == SET_FAN_PWM_DOEN) {
+        Status = EFI_SUCCESS;
+      }
+    }
   }
 
   return Status;
@@ -298,11 +306,13 @@ GetSlotCount(
   gTxPkt[CMD_INDX] = CMD_GET_MEM_COUNT;
   gTxPkt[DAT1_INDX] = (UINT8)Slot;
 
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == GET_SLOT_COUNT_DONE) {
-      *pCount = gRxPkt[DAT2_INDX] | (gRxPkt[DAT3_INDX] << 8) | (gRxPkt[DAT4_INDX] << 16) | (gRxPkt[DAT5_INDX] << 24);
-      Status = EFI_SUCCESS;
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == GET_SLOT_COUNT_DONE) {
+        *pCount = gRxPkt[DAT2_INDX] | (gRxPkt[DAT3_INDX] << 8) | (gRxPkt[DAT4_INDX] << 16) | (gRxPkt[DAT5_INDX] << 24);
+        Status = EFI_SUCCESS;
+      }
     }
   }
 
@@ -316,7 +326,7 @@ SetSlotCountAct(
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
   UINT8 ActTyp[MAX_SLOT_NUMBER];
-
+  
   for (UINT8 i = 0; i < MAX_SLOT_NUMBER; i++) {
     switch (CharToUpper(SlotAct[i])) {
     case 0x0058:        //X NO Action
@@ -339,8 +349,12 @@ SetSlotCountAct(
     gTxPkt[DAT3_INDX] = ActTyp[i * 4 + 1];
     gTxPkt[DAT4_INDX] = ActTyp[i * 4 + 2];
     gTxPkt[DAT5_INDX] = ActTyp[i * 4 + 3];
-    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
+    NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+    if (NumBytes != SIZE_CMD_PACKET) Status = EFI_DEVICE_ERROR;
+    else Status = EFI_SUCCESS;
+  
+/*
     if (!EFI_ERROR(ReadUartData())) {
       if (gRxPkt[CMD_INDX] == CMD_SET_MEM_COUNT_ACTION) {
         gBS->Stall(150);
@@ -350,8 +364,10 @@ SetSlotCountAct(
         Print(L"  [ERROR] Memory Slot Action Communication ERROR : %d\n", i);
         Status = EFI_UNSUPPORTED;
       }
-    }    
+    }
+    */
   }
+
 
   return Status;
 }
@@ -369,12 +385,13 @@ GetVRVoltage(
   InitRxPkt();
   gTxPkt[CMD_INDX] = bCmd;
   gTxPkt[DAT1_INDX] = (UINT8)Channel;
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == bCmd+0x40) {
-      *Vol = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
-      Status = EFI_SUCCESS;
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == bCmd + 0x40) {
+        *Vol = gRxPkt[3] | ((gRxPkt[4] << 8) & 0xFF00);
+        Status = EFI_SUCCESS;
+      }
     }
   }
 
@@ -389,6 +406,7 @@ SetVRVoltage(
   )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
+  
 
   InitTxPkt();
   InitRxPkt();
@@ -396,12 +414,13 @@ SetVRVoltage(
   gTxPkt[DAT1_INDX] = (UINT8)Channel;
   gTxPkt[DAT2_INDX] = (UINT8)(Vol & 0x00FF);
   gTxPkt[DAT3_INDX] = (UINT8)((Vol & 0xFF00) >> 8);
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == bCmd + 0x40) {
 
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == bCmd + 0x40) {
-      
-      Status = EFI_SUCCESS;
+        Status = EFI_SUCCESS;
+      }
     }
   }
 
@@ -414,22 +433,23 @@ GetIPAddr(
 )
 {
   EFI_STATUS Status = EFI_NOT_READY;
-
+  
   InitTxPkt();
   InitRxPkt();
 
   gTxPkt[CMD_INDX] = CMD_GET_IP_INFO;
   gTxPkt[DAT1_INDX] = TYPE_IP_ADDRESS;
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
 
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == GET_IP_INFO_DONE) {
-      Addr->Addr[0] = gRxPkt[DAT2_INDX];
-      Addr->Addr[1] = gRxPkt[DAT3_INDX];
-      Addr->Addr[2] = gRxPkt[DAT4_INDX];
-      Addr->Addr[3] = gRxPkt[DAT5_INDX];
-      
-      Status = EFI_SUCCESS;
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if (NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == GET_IP_INFO_DONE) {
+        Addr->Addr[0] = gRxPkt[DAT2_INDX];
+        Addr->Addr[1] = gRxPkt[DAT3_INDX];
+        Addr->Addr[2] = gRxPkt[DAT4_INDX];
+        Addr->Addr[3] = gRxPkt[DAT5_INDX];
+        Status = EFI_SUCCESS;
+      }
     }
   }
 
@@ -442,7 +462,6 @@ SaveIPAddr(
 )
 {
   EFI_STATUS Status = EFI_INVALID_PARAMETER;
-
   InitTxPkt();
   InitRxPkt();
 
@@ -452,11 +471,12 @@ SaveIPAddr(
   gTxPkt[DAT3_INDX] = Addr->Addr[1];
   gTxPkt[DAT4_INDX] = Addr->Addr[2];
   gTxPkt[DAT5_INDX] = Addr->Addr[3];
-  SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-
-  if (!EFI_ERROR(ReadUartData())) {
-    if (gRxPkt[CMD_INDX] == SET_IP_INFO_DONE) {
-      Status = EFI_SUCCESS;
+  NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+  if(NumBytes == SIZE_CMD_PACKET) {
+    if (!EFI_ERROR(ReadUartData())) {
+      if (gRxPkt[CMD_INDX] == SET_IP_INFO_DONE) {
+        Status = EFI_SUCCESS;
+      }
     }
   }
   return Status;
@@ -480,24 +500,25 @@ SaveBoardInfo(
     gTxPkt[DAT3_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE) + 1);
     gTxPkt[DAT4_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE) + 2);
     gTxPkt[DAT5_INDX] = *(InfoStr+(i * MAX_BOARD_INFO_TABLE) + 3);
-    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-
-    if (!EFI_ERROR(ReadUartData())) {
-      if (gRxPkt[CMD_INDX] == Cmd+0x40) {
-        Status = EFI_SUCCESS;       
-      }
-      else {
-        Status = EFI_NOT_READY;
-        if (Cmd == CMD_SET_BOARD_ID) {
-          Print(L"  [ERROR] Write ID error.index = %d\n", i);
+    NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+    if (NumBytes == SIZE_CMD_PACKET) {
+      if (!EFI_ERROR(ReadUartData())) {
+        if (gRxPkt[CMD_INDX] == Cmd + 0x40) {
+          Status = EFI_SUCCESS;
         }
-        else if (Cmd == CMD_SET_BOARD_SN) {
-          Print(L"  [ERROR] Write SN error.index = %d\n", i);
+        else {
+          Status = EFI_NOT_READY;
+          if (Cmd == CMD_SET_BOARD_ID) {
+            Print(L"  [ERROR] Write ID error.index = %d\n", i);
+          }
+          else if (Cmd == CMD_SET_BOARD_SN) {
+            Print(L"  [ERROR] Write SN error.index = %d\n", i);
+          }
+          break;
         }
-        break;
       }
+      gBS->Stall(150);
     }
-    gBS->Stall(150);
   }
 
   return Status;
@@ -511,33 +532,35 @@ GetBoardInfo(
 )
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
-
+  
   InitTxPkt();
   InitRxPkt();
 
   gTxPkt[CMD_INDX] = Cmd;
   for (UINTN i = 0 ; i < MAX_BOARD_INFO_TABLE ; i++) {
     gTxPkt[DAT1_INDX] = (UINT8)i;
-    SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-    if (!EFI_ERROR(ReadUartData())) {
-      if (gRxPkt[CMD_INDX] == Cmd + 0x40) {
-        *(InfoStr + (i * MAX_BOARD_INFO_TABLE)) = gRxPkt[DAT2_INDX];
-        *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 1) = gRxPkt[DAT3_INDX];
-        *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 2) = gRxPkt[DAT4_INDX];
-        *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 3) = gRxPkt[DAT5_INDX];
+    NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
+    if (NumBytes == SIZE_CMD_PACKET) {
+      if (!EFI_ERROR(ReadUartData())) {
+        if (gRxPkt[CMD_INDX] == Cmd + 0x40) {
+          *(InfoStr + (i * MAX_BOARD_INFO_TABLE)) = gRxPkt[DAT2_INDX];
+          *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 1) = gRxPkt[DAT3_INDX];
+          *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 2) = gRxPkt[DAT4_INDX];
+          *(InfoStr + (i * MAX_BOARD_INFO_TABLE) + 3) = gRxPkt[DAT5_INDX];
+        }
       }
+      else {
+        Status = EFI_NOT_READY;
+        if (Cmd == CMD_GET_BOARD_ID) {
+          Print(L"  [ERROR] Read ID error.index = %d\n", i);
+        }
+        else if (Cmd == CMD_GET_BOARD_SN) {
+          Print(L"  [ERROR] Read SN error.index = %d\n", i);
+        }
+        break;
+      }
+      gBS->Stall(150);
     }
-    else {
-      Status = EFI_NOT_READY;
-      if (Cmd == CMD_GET_BOARD_ID) {
-        Print(L"  [ERROR] Read ID error.index = %d\n", i);
-      }
-      else if (Cmd == CMD_GET_BOARD_SN) {
-        Print(L"  [ERROR] Read SN error.index = %d\n", i);
-      }
-      break;
-    }
-    gBS->Stall(150);
   }
 
   return Status;

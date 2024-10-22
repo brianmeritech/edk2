@@ -456,12 +456,8 @@ GetIDFunc(
     VerStr,
     bufSize,
     L"VC S/W VERSION=%d.%d.%d\n VC F/W VERSION=%d.%d.%d\n",
-    VERSION_MAJOR,
-    VERSION_MINOR,
-    VERSION_BUILD,
-    V1,
-    V2,
-    V3
+    VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD,
+    V1, V2, V3
   );
 
   Status = VoltFile->Write(
