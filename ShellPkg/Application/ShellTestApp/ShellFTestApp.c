@@ -134,7 +134,6 @@ ShellAppMain(
         SlotStr
       );
     }
-
     
     if (!EFI_ERROR(Status)) {
       NewFile->Close(NewFile);

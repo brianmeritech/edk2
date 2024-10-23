@@ -162,8 +162,8 @@
   #ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyApp.inf
   #ShellPkg/Application/AcpiViewApp/AcpiViewApp.inf
   #ShellPkg/Application/SerialTest/SerialTest.inf
-  ShellPkg/Application/ShellCTestApp/ShellCTestApp.inf
-  ShellPkg/Application/ShellCTestApp/ShellFTestApp.inf
+  ShellPkg/Application/ShellTestApp/ShellCTestApp.inf
+  ShellPkg/Application/ShellTestApp/ShellFTestApp.inf
   ShellPkg/Application/GNRAP/VC.inf
   ShellPkg/Application/GNRAP/IPReader.inf
   ShellPkg/Application/GNRAP/IDReader.inf
