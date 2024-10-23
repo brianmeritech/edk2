@@ -28,7 +28,7 @@
 
 [Sources]
   IPReader.c
-  IPReader.h
+  VC.h
   MF.c
   MF.h
 

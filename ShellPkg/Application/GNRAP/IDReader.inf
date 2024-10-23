@@ -28,7 +28,7 @@
 
 [Sources]
   IDReader.c
-  IDReader.h
+  VC.h
   MF.c
   MF.h
 
