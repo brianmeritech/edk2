@@ -49,7 +49,7 @@ InitFileHandle(
   void
 );
 
-void
+EFI_STATUS
 GetIDFunc(
   void
 );
@@ -416,12 +416,12 @@ InitFileHandle(
   return Status;
 }
 
-void
+EFI_STATUS
 GetIDFunc(
   void
 )
 {
-  EFI_STATUS Status;
+  EFI_STATUS Status = EFI_UNSUPPORTED;
   EFI_FILE_PROTOCOL* VoltFile;
   EFI_FILE_PROTOCOL* SpcFile;
 
@@ -434,7 +434,7 @@ GetIDFunc(
   Status = InitFileHandle();
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to Get File Handle %r\n", Status);
-    return;
+    return Status;
   }
 
   gRoot->Open(
@@ -468,6 +468,7 @@ GetIDFunc(
 
   if (EFI_ERROR(Status)) {
     Print(L"  Failed to write VOLTDEV.txt\n");
+    return Status;
   }
   Status = VoltFile->Close(VoltFile);
   
@@ -502,10 +503,12 @@ GetIDFunc(
 
     if (EFI_ERROR(Status)) {
       Print(L"  Failed to write Slot%d SPCLED.txt\n");
+      return Status;
     }
   }
 
   Status = SpcFile->Close(SpcFile);
   Print(L"  Set CPX_VC -SL BBBBBBBB and Create VOLTDEV.TXT & SPCLED.TXT Ok!\n\n");
 
+  return Status;
 }
