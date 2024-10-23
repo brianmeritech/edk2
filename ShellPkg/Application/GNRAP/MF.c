@@ -5,8 +5,10 @@
   Copyright (c) 1996 - 2024, Meritech Corporation. All rights reserved.<BR>
 
 **/
-#include <Library/SerialPortLib.h>
+
 #include "VC.h"
+
+#include <Library/SerialPortLib.h>
 
 #define RETRY                           5
 
@@ -154,7 +156,6 @@ SetP80(
   gTxPkt[DAT2_INDX] = ((UINT8)Dat & 0xF0) >> 4;  //High Byte
 
   NumBytes = SerialPortWrite(gTxPkt, SIZE_CMD_PACKET);
-  
 }
 
 EFI_STATUS
@@ -368,7 +369,6 @@ SetSlotCountAct(
     */
   }
 
-
   return Status;
 }
 
@@ -407,7 +407,6 @@ SetVRVoltage(
 {
   EFI_STATUS Status = EFI_UNSUPPORTED;
   
-
   InitTxPkt();
   InitRxPkt();
   gTxPkt[CMD_INDX] = bCmd;
@@ -523,7 +522,6 @@ SaveBoardInfo(
 
   return Status;
 }
-
 
 EFI_STATUS
 GetBoardInfo(
